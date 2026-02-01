@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>춘천 장례식장 빈소현황</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #f0ece6;
+    --card-bg: #fff;
+    --text-primary: #2a2a2a;
+    --text-secondary: #5c564f;
+    --text-muted: #9a928a;
+    --accent: #4a6e5c;
+    --accent-light: #eaf2ee;
+    --accent-mid: #c5d9cc;
+    --border: #e3ddd6;
+    --red: #c0504a;
+    --red-light: #faf0ef;
+    --shadow: 0 2px 20px rgba(0,0,0,0.06);
+    --radius: 14px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* ─── 헤더 ─── */
+  .header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 20px 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .header p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* ─── 탭 네비 ─── */
+  .tabs {
+    display: flex;
+    gap: 6px;
+    padding: 16px 12px 0;
+    max-width: 720px;
+    margin: 0 auto;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display:none; }
+
+  .tab {
+    flex-shrink: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab:hover { border-color: var(--accent-mid); }
+  .tab.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .tab .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent-mid);
+  }
+  .tab.active .dot { background: rgba(255,255,255,0.5); }
+  .tab .dot.has-data { background: #6aaa7e; }
+  .tab.active .dot.has-data { background: #a8e6bf; }
+  .tab .dot.no-data { background: var(--border); }
+
+  /* ─── 콘텐츠 영역 ─── */
+  .content {
+    max-width: 720px;
+    margin: 16px auto 40px;
+    padding: 0 12px;
+  }
+
+  /* ─── 장례식장 카드 ─── */
+  .parlor-card {
+    display: none;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: fadeIn 0.25s ease;
+  }
+  .parlor-card.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(4px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* 카드 헤더 */
+  .card-header {
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-header-left { display:flex; align-items:center; gap:10px; }
+  .card-header-left h2 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  .card-header-right { display:flex; gap:8px; align-items:center; }
+
+  /* 외부 링크 버튼 */
+  .btn-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid var(--accent-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-link:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  .btn-link svg { width:13px; height:13px; }
+
+  /* ─── iframe 영역 ─── */
+  .iframe-wrap {
+    width: 100%;
+    min-height: 280px;
+    position: relative;
+    background: #faf8f5;
+  }
+  .iframe-wrap iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    border: none;
+    display: block;
+  }
+
+  /* ─── 고인검색 안내 (호반) ─── */
+  .search-notice {
+    padding: 28px 20px;
+    text-align: center;
+  }
+  .search-notice .icon-wrap {
+    width: 48px; height: 48px;
+    background: var(--accent-light);
+    border-radius: 50%;
+    display: flex; align-items:center; justify-content:center;
+    margin: 0 auto 14px;
+  }
+  .search-notice .icon-wrap svg { width:22px; height:22px; color: var(--accent); }
+  .search-notice p {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+  .search-notice .btn-link { margin-top: 14px; }
+
+  /* ─── 업데이트 중 (시민장례식장) ─── */
+  .updating-notice {
+    padding: 48px 20px;
+    text-align: center;
+  }
+  .updating-notice .icon-wrap {
+    width: 52px; height: 52px;
+    background: #fef3e2;
+    border-radius: 50%;
+    display: flex; align-items:center; justify-content:center;
+    margin: 0 auto 16px;
+  }
+  .updating-notice .icon-wrap svg { width:24px; height:24px; color:#d4883a; }
+  .updating-notice h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .updating-notice p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ─── 푸터 정보 ─── */
+  .card-footer {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fdfcfa;
+  }
+  .card-footer-info {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .card-footer-info strong {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  /* ─── 전화번호 클릭 가능 ─── */
+  a.tel {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  a.tel:hover { text-decoration: underline; }
+
+  /* ─── 반응형 ─── */
+  @media (max-width: 500px) {
+    .header { padding: 18px 14px 16px; }
+    .header h1 { font-size: 1.15rem; }
+    .tabs { padding: 12px 8px 0; gap: 5px; }
+    .tab { padding: 7px 12px; font-size: 0.75rem; }
+    .card-header { padding: 14px 16px 12px; flex-direction:column; align-items:flex-start; gap:8px; }
+    .card-footer { flex-direction:column; gap:4px; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <h1>춘천 장례식장 빈소현황</h1>
+  <p>실시간 빈소 현황 확인</p>
+</div>
+
+<!-- 탭 -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(0)">
+    <span class="dot has-data"></span> 춘천장례식장
+  </button>
+  <button class="tab" onclick="switchTab(1)">
+    <span class="dot has-data"></span> 강원효장례문화원
+  </button>
+  <button class="tab" onclick="switchTab(2)">
+    <span class="dot has-data"></span> 호반병원
+  </button>
+  <button class="tab" onclick="switchTab(3)">
+    <span class="dot has-data"></span> 강원대학교병원
+  </button>
+  <button class="tab" onclick="switchTab(4)">
+    <span class="dot no-data"></span> 시민장례식장
+  </button>
+</div>
+
+<!-- 콘텐츠 -->
+<div class="content">
+
+  <!-- 0. 춘천장례식장 -->
+  <div class="parlor-card active" id="card-0">
+    <div class="card-header">
+      <div class="card-header-left">
+        <h2>춘천장례식장</h2>
+      </div>
+      <div class="card-header-right">
+        <a href="https://e-iris.co.kr/display/parlor/iframe/324" target="_blank" class="btn-link">
+          실시간 빈소현황
+          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="https://e-iris.co.kr/display/parlor/iframe/324" scrolling="yes" allow=""></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="card-footer-info">📍 동면 소양강로 409</span>
+      <span class="card-footer-info">📞 <a href="tel:03325644444" class="tel">033-256-4444</a></span>
+    </div>
+  </div>
+
+  <!-- 1. 강원효장례문화원 -->
+  <div class="parlor-card" id="card-1">
+    <div class="card-header">
+      <div class="card-header-left">
+        <h2>강원효장례문화원</h2>
+      </div>
+      <div class="card-header-right">
+        <a href="https://e-baro.co.kr/api_view/?code=icBnKH" target="_blank" class="btn-link">
+          실시간 빈소현황
+          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="https://e-baro.co.kr/api_view/?code=icBnKH" scrolling="yes"></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="card-footer-info">📍 동내면 순환대로 877</span>
+      <span class="card-footer-info">📞 <a href="tel:03326144441" class="tel">033-261-4441</a></span>
+    </div>
+  </div>
+
+  <!-- 2. 호반병원장례식장 -->
+  <div class="parlor-card" id="card-2">
+    <div class="card-header">
+      <div class="card-header-left">
+        <h2>호반병원장례식장</h2>
+      </div>
+      <div class="card-header-right">
+        <a href="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" target="_blank" class="btn-link">
+          실시간 빈소현황
+          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" scrolling="yes"></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="card-footer-info">📍 삼천동 옛경춘로 663</span>
+      <span class="card-footer-info">📞 <a href="tel:03325200046" class="tel">033-252-0046</a></span>
+    </div>
+  </div>
+
+  <!-- 3. 강원대학교병원장례식장 -->
+  <div class="parlor-card" id="card-3">
+    <div class="card-header">
+      <div class="card-header-left">
+        <h2>강원대학교병원장례식장</h2>
+      </div>
+      <div class="card-header-right">
+        <a href="https://m.knuh.or.kr/hospitalinfor/funeral_01.asp" target="_blank" class="btn-link">
+          실시간 빈소현황
+          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="https://m.knuh.or.kr/hospitalinfor/funeral_01.asp" scrolling="yes"></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="card-footer-info">📍 효자동 백령로 156</span>
+      <span class="card-footer-info">📞 <a href="tel:03325445611" class="tel">033-254-5611</a></span>
+    </div>
+  </div>
+
+  <!-- 4. 시민장례식장 -->
+  <div class="parlor-card" id="card-4">
+    <div class="card-header">
+      <div class="card-header-left">
+        <h2>춘천 시민장례식장</h2>
+      </div>
+    </div>
+    <div class="updating-notice">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>빈소현황 업데이트 중</h3>
+      <p>현재 빈소현황 정보가 업데이트 진행 중입니다.<br>잠시 후 다시 확인해 주세요.</p>
+    </div>
+    <div class="card-footer">
+      <span class="card-footer-info">📍 춘천시 시민장례식장</span>
+      <span class="card-footer-info" style="color:var(--text-muted);">업데이트 중</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const cards = document.querySelectorAll('.parlor-card');
+
+  function switchTab(index) {
+    tabs.forEach((t, i) => t.classList.toggle('active', i === index));
+    cards.forEach((c, i) => c.classList.toggle('active', i === index));
+  }
+</script>
+
+</body>
+</html>
