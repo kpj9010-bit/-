@@ -4,416 +4,641 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>춘천 장례식장 빈소현황</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=Noto+Sans+KR:wght@300;400;500;600&display=swap');
+/* ═══════════════════════════════════════════
+   기본 설정
+   ═══════════════════════════════════════════ */
+:root {
+  --bg:            #eae7e1;
+  --card:          #ffffff;
+  --t1:            #1e1e1e;        /* 주 텍스트 */
+  --t2:            #52524e;        /* 보조 텍스트 */
+  --t3:            #8c8480;        /* 미팅 텍스트 */
+  --accent:        #4a6e5c;        /* 초록 계열 */
+  --accent-light:  #eaf2ee;
+  --border:        #e2ddd7;
+  --border-soft:   #eceae6;
+  --occ-bg:        #e6efe9;        /* 사용중 배경 */
+  --occ-text:      #2d6b4a;        /* 사용중 텍스트 */
+  --empty-bg:      #f5f3f0;        /* 빈소 배경 */
+  --empty-text:    #a09890;        /* 빈소 텍스트 */
+  --warn-bg:       #fdf4e8;
+  --warn-text:     #c07a2e;
+}
 
-  :root {
-    --bg: #f0ece6;
-    --card-bg: #fff;
-    --text-primary: #2a2a2a;
-    --text-secondary: #5c564f;
-    --text-muted: #9a928a;
-    --accent: #4a6e5c;
-    --accent-light: #eaf2ee;
-    --accent-mid: #c5d9cc;
-    --border: #e3ddd6;
-    --red: #c0504a;
-    --red-light: #faf0ef;
-    --shadow: 0 2px 20px rgba(0,0,0,0.06);
-    --radius: 14px;
-  }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
 
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: var(--bg);
-    color: var(--text-primary);
-    min-height: 100vh;
-  }
+/* ═══════════════════════════════════════════
+   고정 헤더
+   ═══════════════════════════════════════════ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+  padding: 18px 16px 14px;
+  text-align: center;
+}
+.header h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 1.18rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  margin-bottom: 2px;
+}
+.header .sub {
+  font-size: 0.7rem;
+  color: var(--t3);
+  font-weight: 300;
+}
 
-  /* ─── 헤더 ─── */
-  .header {
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 24px 20px 20px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  }
-  .header h1 {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 4px;
-  }
-  .header p {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    font-weight: 300;
-  }
+/* ═══════════════════════════════════════════
+   탭 네비
+   ═══════════════════════════════════════════ */
+.tabs {
+  display: flex;
+  gap: 6px;
+  padding: 12px 12px 0;
+  max-width: 680px;
+  margin: 0 auto;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs::-webkit-scrollbar { display: none; }
 
-  /* ─── 탭 네비 ─── */
-  .tabs {
-    display: flex;
-    gap: 6px;
-    padding: 16px 12px 0;
-    max-width: 720px;
-    margin: 0 auto;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display:none; }
+.tab {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 13px;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--t2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+.tab:hover { border-color: #b5ccc0; }
+.tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.tab .cnt {
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 8px;
+  background: var(--accent-light);
+  color: var(--accent);
+}
+.tab.active .cnt {
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+}
 
-  .tab {
-    flex-shrink: 0;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 30px;
-    padding: 8px 16px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .tab:hover { border-color: var(--accent-mid); }
-  .tab.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
-  .tab .dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--accent-mid);
-  }
-  .tab.active .dot { background: rgba(255,255,255,0.5); }
-  .tab .dot.has-data { background: #6aaa7e; }
-  .tab.active .dot.has-data { background: #a8e6bf; }
-  .tab .dot.no-data { background: var(--border); }
+/* ═══════════════════════════════════════════
+   장례식장 카드 컨테이너
+   ═══════════════════════════════════════════ */
+.cards {
+  max-width: 680px;
+  margin: 12px auto 60px;
+  padding: 0 12px;
+}
 
-  /* ─── 콘텐츠 영역 ─── */
-  .content {
-    max-width: 720px;
-    margin: 16px auto 40px;
-    padding: 0 12px;
-  }
+.card {
+  display: none;
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  overflow: hidden;
+  animation: pop .2s ease;
+}
+.card.show { display: block; }
 
-  /* ─── 장례식장 카드 ─── */
-  .parlor-card {
-    display: none;
-    background: var(--card-bg);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    animation: fadeIn 0.25s ease;
-  }
-  .parlor-card.active { display: block; }
+@keyframes pop {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
 
-  @keyframes fadeIn {
-    from { opacity:0; transform:translateY(4px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
+/* 카드 상단 — 이름 + 전화 */
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.card-top h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+.card-top .tel a {
+  font-size: 0.72rem;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.card-top .tel a:hover { text-decoration: underline; }
 
-  /* 카드 헤더 */
-  .card-header {
-    padding: 18px 20px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-  }
-  .card-header-left { display:flex; align-items:center; gap:10px; }
-  .card-header-left h2 {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 1.05rem;
-    font-weight: 600;
-  }
-  .card-header-right { display:flex; gap:8px; align-items:center; }
+/* 소계 바 */
+.stat-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 7px 16px;
+  background: #f7f5f2;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.68rem;
+  color: var(--t3);
+}
+.stat-bar .s { display: flex; align-items: center; gap: 3px; }
+.stat-bar .s strong { font-weight: 600; }
+.stat-bar .s.occ strong { color: var(--occ-text); }
+.stat-bar .s.emp strong { color: var(--empty-text); }
+.stat-bar .orig {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.65rem;
+  color: var(--t3);
+  text-decoration: none;
+  transition: color .18s;
+}
+.stat-bar .orig:hover { color: var(--accent); }
+.stat-bar .orig svg { width: 10px; height: 10px; }
 
-  /* 외부 링크 버튼 */
-  .btn-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: var(--accent-light);
-    color: var(--accent);
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    border: 1px solid var(--accent-mid);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-link:hover {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
-  .btn-link svg { width:13px; height:13px; }
+/* ═══════════════════════════════════════════
+   빈소 행 리스트
+   ═══════════════════════════════════════════ */
+.binso-list { padding: 6px 0; }
 
-  /* ─── iframe 영역 ─── */
-  .iframe-wrap {
-    width: 100%;
-    min-height: 280px;
-    position: relative;
-    background: #faf8f5;
-  }
-  .iframe-wrap iframe {
-    width: 100%;
-    height: 100%;
-    min-height: 320px;
-    border: none;
-    display: block;
-  }
+.binso-row {
+  display: flex;
+  min-height: 58px;
+  border-bottom: 1px solid #f0ece6;
+  transition: background .12s;
+}
+.binso-row:last-child { border-bottom: none; }
+.binso-row:hover { background: #fdfdfc; }
 
-  /* ─── 고인검색 안내 (호반) ─── */
-  .search-notice {
-    padding: 28px 20px;
-    text-align: center;
-  }
-  .search-notice .icon-wrap {
-    width: 48px; height: 48px;
-    background: var(--accent-light);
-    border-radius: 50%;
-    display: flex; align-items:center; justify-content:center;
-    margin: 0 auto 14px;
-  }
-  .search-notice .icon-wrap svg { width:22px; height:22px; color: var(--accent); }
-  .search-notice p {
-    font-size: 0.82rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    max-width: 320px;
-    margin: 0 auto;
-  }
-  .search-notice .btn-link { margin-top: 14px; }
+/* 왼쪽 — 빈소 번호 블록 */
+.b-num {
+  width: 48px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  border-right: 1px solid #f0ece6;
+}
+/* 사용중 상태 */
+.binso-row.occ .b-num { background: var(--occ-bg); }
+.binso-row.occ .b-num .b-label { color: var(--occ-text); }
+.binso-row.occ .b-num .b-val   { color: var(--occ-text); }
+/* 빈소 상태 */
+.binso-row.emp .b-num { background: var(--empty-bg); }
+.binso-row.emp .b-num .b-label { color: var(--empty-text); }
+.binso-row.emp .b-num .b-val   { color: #c8c2bb; }
 
-  /* ─── 업데이트 중 (시민장례식장) ─── */
-  .updating-notice {
-    padding: 48px 20px;
-    text-align: center;
-  }
-  .updating-notice .icon-wrap {
-    width: 52px; height: 52px;
-    background: #fef3e2;
-    border-radius: 50%;
-    display: flex; align-items:center; justify-content:center;
-    margin: 0 auto 16px;
-  }
-  .updating-notice .icon-wrap svg { width:24px; height:24px; color:#d4883a; }
-  .updating-notice h3 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 6px;
-  }
-  .updating-notice p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    line-height: 1.6;
-  }
+.b-num .b-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.b-num .b-val {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: 1px;
+}
 
-  /* ─── 푸터 정보 ─── */
-  .card-footer {
-    padding: 12px 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fdfcfa;
-  }
-  .card-footer-info {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-  }
-  .card-footer-info strong {
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
+/* 오른쪽 — 정보 영역 */
+.b-info {
+  flex: 1;
+  padding: 9px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
 
-  /* ─── 전화번호 클릭 가능 ─── */
-  a.tel {
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 500;
-  }
-  a.tel:hover { text-decoration: underline; }
+/* 고인명 행 */
+.b-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.b-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.binso-row.occ .b-name { color: var(--t1); }
+.binso-row.emp .b-name { color: #bbb5ae; font-weight: 400; font-style: italic; }
 
-  /* ─── 반응형 ─── */
-  @media (max-width: 500px) {
-    .header { padding: 18px 14px 16px; }
-    .header h1 { font-size: 1.15rem; }
-    .tabs { padding: 12px 8px 0; gap: 5px; }
-    .tab { padding: 7px 12px; font-size: 0.75rem; }
-    .card-header { padding: 14px 16px 12px; flex-direction:column; align-items:flex-start; gap:8px; }
-    .card-footer { flex-direction:column; gap:4px; align-items:flex-start; }
-  }
+/* 상태 배지 */
+.badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 8px;
+  letter-spacing: 0.2px;
+}
+.badge.occ { background: var(--occ-bg); color: var(--occ-text); }
+.badge.emp { background: var(--empty-bg); color: var(--empty-text); }
+
+/* 세부 정보 행 */
+.b-detail {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.b-detail .d {
+  font-size: 0.68rem;
+  color: var(--t3);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.b-detail .d .dv {
+  color: var(--t2);
+  font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════
+   업데이트 중 & 로딩 상태
+   ═══════════════════════════════════════════ */
+.notice {
+  padding: 38px 20px;
+  text-align: center;
+}
+.notice .ico {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+}
+.notice .ico svg { width: 20px; height: 20px; }
+.notice .ico.warn { background: var(--warn-bg); }
+.notice .ico.warn svg { color: var(--warn-text); }
+.notice .ico.load { background: #f0f4ff; }
+.notice .ico.load svg { color: #5577cc; }
+.notice h3 { font-size: 0.86rem; font-weight: 600; margin-bottom: 4px; }
+.notice p { font-size: 0.72rem; color: var(--t3); line-height: 1.6; }
+
+/* 스핀 animaton */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
+
+/* ═══════════════════════════════════════════
+   반응형
+   ═══════════════════════════════════════════ */
+@media (max-width: 440px) {
+  .b-num { width: 42px; }
+  .b-num .b-val { font-size: 0.76rem; }
+  .b-info { padding: 8px 10px; }
+  .card-top { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
 </style>
 </head>
 <body>
 
-<!-- 헤더 -->
 <div class="header">
   <h1>춘천 장례식장 빈소현황</h1>
-  <p>실시간 빈소 현황 확인</p>
+  <span class="sub" id="lastUpdate">로딩 중…</span>
 </div>
 
-<!-- 탭 -->
-<div class="tabs">
-  <button class="tab active" onclick="switchTab(0)">
-    <span class="dot has-data"></span> 춘천장례식장
-  </button>
-  <button class="tab" onclick="switchTab(1)">
-    <span class="dot has-data"></span> 강원효장례문화원
-  </button>
-  <button class="tab" onclick="switchTab(2)">
-    <span class="dot has-data"></span> 호반병원
-  </button>
-  <button class="tab" onclick="switchTab(3)">
-    <span class="dot has-data"></span> 강원대학교병원
-  </button>
-  <button class="tab" onclick="switchTab(4)">
-    <span class="dot no-data"></span> 시민장례식장
-  </button>
-</div>
-
-<!-- 콘텐츠 -->
-<div class="content">
-
-  <!-- 0. 춘천장례식장 -->
-  <div class="parlor-card active" id="card-0">
-    <div class="card-header">
-      <div class="card-header-left">
-        <h2>춘천장례식장</h2>
-      </div>
-      <div class="card-header-right">
-        <a href="https://e-iris.co.kr/display/parlor/iframe/324" target="_blank" class="btn-link">
-          실시간 빈소현황
-          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="iframe-wrap">
-      <iframe src="https://e-iris.co.kr/display/parlor/iframe/324" scrolling="yes" allow=""></iframe>
-    </div>
-    <div class="card-footer">
-      <span class="card-footer-info">📍 동면 소양강로 409</span>
-      <span class="card-footer-info">📞 <a href="tel:03325644444" class="tel">033-256-4444</a></span>
-    </div>
-  </div>
-
-  <!-- 1. 강원효장례문화원 -->
-  <div class="parlor-card" id="card-1">
-    <div class="card-header">
-      <div class="card-header-left">
-        <h2>강원효장례문화원</h2>
-      </div>
-      <div class="card-header-right">
-        <a href="https://e-baro.co.kr/api_view/?code=icBnKH" target="_blank" class="btn-link">
-          실시간 빈소현황
-          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="iframe-wrap">
-      <iframe src="https://e-baro.co.kr/api_view/?code=icBnKH" scrolling="yes"></iframe>
-    </div>
-    <div class="card-footer">
-      <span class="card-footer-info">📍 동내면 순환대로 877</span>
-      <span class="card-footer-info">📞 <a href="tel:03326144441" class="tel">033-261-4441</a></span>
-    </div>
-  </div>
-
-  <!-- 2. 호반병원장례식장 -->
-  <div class="parlor-card" id="card-2">
-    <div class="card-header">
-      <div class="card-header-left">
-        <h2>호반병원장례식장</h2>
-      </div>
-      <div class="card-header-right">
-        <a href="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" target="_blank" class="btn-link">
-          실시간 빈소현황
-          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="iframe-wrap">
-      <iframe src="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" scrolling="yes"></iframe>
-    </div>
-    <div class="card-footer">
-      <span class="card-footer-info">📍 삼천동 옛경춘로 663</span>
-      <span class="card-footer-info">📞 <a href="tel:03325200046" class="tel">033-252-0046</a></span>
-    </div>
-  </div>
-
-  <!-- 3. 강원대학교병원장례식장 -->
-  <div class="parlor-card" id="card-3">
-    <div class="card-header">
-      <div class="card-header-left">
-        <h2>강원대학교병원장례식장</h2>
-      </div>
-      <div class="card-header-right">
-        <a href="https://m.knuh.or.kr/hospitalinfor/funeral_01.asp" target="_blank" class="btn-link">
-          실시간 빈소현황
-          <svg viewBox="0 0 14 14" fill="none"><path d="M10 2H12V4M6.5 7.5L12 2M10.5 7V11.5C10.5 12.3 9.8 13 9 13H2.5C1.7 13 1 12.3 1 11.5V5C1 4.2 1.7 3.5 2.5 3.5H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </div>
-    </div>
-    <div class="iframe-wrap">
-      <iframe src="https://m.knuh.or.kr/hospitalinfor/funeral_01.asp" scrolling="yes"></iframe>
-    </div>
-    <div class="card-footer">
-      <span class="card-footer-info">📍 효자동 백령로 156</span>
-      <span class="card-footer-info">📞 <a href="tel:03325445611" class="tel">033-254-5611</a></span>
-    </div>
-  </div>
-
-  <!-- 4. 시민장례식장 -->
-  <div class="parlor-card" id="card-4">
-    <div class="card-header">
-      <div class="card-header-left">
-        <h2>춘천 시민장례식장</h2>
-      </div>
-    </div>
-    <div class="updating-notice">
-      <div class="icon-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <circle cx="12" cy="12" r="9"/>
-          <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h3>빈소현황 업데이트 중</h3>
-      <p>현재 빈소현황 정보가 업데이트 진행 중입니다.<br>잠시 후 다시 확인해 주세요.</p>
-    </div>
-    <div class="card-footer">
-      <span class="card-footer-info">📍 춘천시 시민장례식장</span>
-      <span class="card-footer-info" style="color:var(--text-muted);">업데이트 중</span>
-    </div>
-  </div>
-
-</div>
+<div class="tabs" id="tabs"></div>
+<div class="cards" id="cards"></div>
 
 <script>
-  const tabs = document.querySelectorAll('.tab');
-  const cards = document.querySelectorAll('.parlor-card');
-
-  function switchTab(index) {
-    tabs.forEach((t, i) => t.classList.toggle('active', i === index));
-    cards.forEach((c, i) => c.classList.toggle('active', i === index));
+/* ═══════════════════════════════════════════
+   장례식장 정보 정의
+   ═══════════════════════════════════════════ */
+const PARLORS = [
+  {
+    id: 'chuncheon',
+    name: '춘천장례식장',
+    tel: '033-256-4444',
+    telHref: 'tel:03325644444',
+    origUrl: 'https://e-iris.co.kr/display/parlor/iframe/324',
+    source: 'static', // 수동 유지
+    allNums: ['101호','102호','201호','202호','301호'],
+    binsos: [
+      { num: '101호', name: '김○○',  occ: true,  place: '춘천안식원 동산추모공원', checkin: '02.01 10:00', checkout: '02.02 07:00' },
+      { num: '102호', occ: false },
+      { num: '201호', name: '이○○',  occ: true,  place: '춘천안식원 서울현충원',   checkin: '02.01 14:00', checkout: '02.03 06:30' },
+      { num: '202호', occ: false },
+      { num: '301호', occ: false },
+    ]
+  },
+  {
+    id: 'hyojanglye',
+    name: '강원효장례문화원',
+    tel: '033-261-4441',
+    telHref: 'tel:03326144441',
+    origUrl: 'https://e-baro.co.kr/api_view/?code=icBnKH',
+    source: 'proxy', // 공개 프록시로 실시간 fetch 가능
+    fetchUrl: 'https://e-baro.co.kr/api_view/?code=icBnKH',
+    allNums: ['101호','201호','202호','301호','302호'],
+    binsos: []
+  },
+  {
+    id: 'hoban',
+    name: '호반병원장례식장',
+    tel: '033-252-0046',
+    telHref: 'tel:03325200046',
+    origUrl: 'http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc',
+    source: 'static',
+    allNums: ['1호(특실)','2호','3호','5호','6호','7호','8호'],
+    binsos: [
+      { num: '1호(특실)', name: '운경애', occ: true,  place: '춘천안식공원', checkin: '02.02 09:00', checkout: '02.03 06:30' },
+      { num: '2호', occ: false },
+      { num: '3호', occ: false },
+      { num: '5호', occ: false },
+      { num: '6호', name: '조성재', occ: true,  place: '춘천안식공원', checkin: '02.01 11:00', checkout: '02.02 06:30' },
+      { num: '7호', occ: false },
+      { num: '8호', occ: false },
+    ]
+  },
+  {
+    id: 'gangwon-univ',
+    name: '강원대학교병원장례식장',
+    tel: '033-254-5611',
+    telHref: 'tel:03325445611',
+    origUrl: 'https://m.knuh.or.kr/hospitalinfor/funeral_01.asp',
+    source: 'static',
+    allNums: ['1호','2호','3호','5호','6호','7호'],
+    binsos: [
+      { num: '1호', occ: false },
+      { num: '2호', occ: false },
+      { num: '3호', occ: false },
+      { num: '5호', name: '이복례', occ: true,  place: '춘천 안식원', checkin: '02.01 09:30', checkout: '02.02 06:00' },
+      { num: '6호', name: '김영미', occ: true,  place: '춘천 안식원', checkin: '02.02 09:30', checkout: '02.03 08:00' },
+      { num: '7호', occ: false },
+    ]
+  },
+  {
+    id: 'citizen',
+    name: '춘천 시민장례식장',
+    tel: null,
+    updating: true,
+    source: 'static',
+    binsos: []
   }
-</script>
+];
 
+/* ═══════════════════════════════════════════
+   날짜 포맷 유틸
+   ═══════════════════════════════════════════ */
+function fmtDate(s) {
+  if (!s) return '';
+  s = s.trim();
+  let m = s.match(/(\d{4})-(\d{2})-(\d{2})\s+([\d:]+)/);
+  if (m) return `${m[2]}.${m[3]} ${m[4]}`;
+  m = s.match(/(\d{1,2})월\s*(\d{1,2})일[.\s]*(\d{1,2})시\s*(\d{1,2})분/);
+  if (m) return `${m[1].padStart(2,'0')}.${m[2].padStart(2,'0')} ${m[3].padStart(2,'0')}:${m[4].padStart(2,'0')}`;
+  return s;
+}
+
+/* ═══════════════════════════════════════════
+   ① 효장례문화원 파싱 (프록시 실시간 fetch용)
+   ═══════════════════════════════════════════ */
+function parseHyo(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const rows = doc.querySelectorAll('table tr');
+  const result = [];
+  rows.forEach(row => {
+    const tds = row.querySelectorAll('td');
+    if (tds.length >= 7) {
+      const num  = tds[1]?.textContent?.trim();
+      const name = tds[2]?.textContent?.trim();
+      const place= tds[4]?.textContent?.trim();
+      const ci   = tds[5]?.textContent?.trim();
+      const co   = tds[6]?.textContent?.trim();
+      if (num && name && !num.includes('번호')) {
+        result.push({ num, name, occ: true, place, checkin: fmtDate(ci), checkout: fmtDate(co) });
+      }
+    }
+  });
+  return result;
+}
+
+/* ═══════════════════════════════════════════
+   공개 CORS 프록시로 효장례 fetch
+   ═══════════════════════════════════════════ */
+const CORS_PROXIES = [
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.org/?${encodeURIComponent(url)}`,
+];
+
+async function fetchViaProxy(url) {
+  for (const buildUrl of CORS_PROXIES) {
+    try {
+      const res = await fetch(buildUrl(url), { signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const html = await res.text();
+        if (html.length > 100) return html;
+      }
+    } catch (e) { continue; }
+  }
+  return null;
+}
+
+async function fetchHyo(p) {
+  const html = await fetchViaProxy(p.fetchUrl);
+  if (!html) { console.warn(`[${p.name}] 프록시 실패`); return false; }
+
+  const occupied = parseHyo(html);
+  const occMap = {};
+  occupied.forEach(o => { occMap[o.num] = o; });
+  p.binsos = p.allNums.map(n => occMap[n] || { num: n, occ: false });
+
+  console.log(`[${p.name}] ✅ 프록시 업데이트 완료 — 사용중 ${occupied.length}개`);
+  return true;
+}
+
+/* ═══════════════════════════════════════════
+   전체 업데이트
+   ═══════════════════════════════════════════ */
+async function updateAll() {
+  // 효장례 — 프록시 실시간
+  for (let i = 0; i < PARLORS.length; i++) {
+    const p = PARLORS[i];
+    if (p.source !== 'proxy') continue;
+    const ok = await fetchHyo(p);
+    if (ok) rerenderCard(i);
+  }
+  document.getElementById('lastUpdate').textContent =
+    '마지막 업데이트: ' + new Date().toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit' });
+}
+
+/* ═══════════════════════════════════════════
+   카드 재렌더링
+   ═══════════════════════════════════════════ */
+function rerenderCard(idx) {
+  const p    = PARLORS[idx];
+  const card = document.getElementById('card-' + idx);
+  const tab  = document.querySelectorAll('.tab')[idx];
+  if (!card || !tab) return;
+
+  card.innerHTML = buildCard(p);
+
+  const occ   = (p.binsos || []).filter(b => b.occ).length;
+  const total = (p.binsos || []).length;
+  tab.innerHTML = p.name + ' <span class="cnt">' + (p.updating ? '–' : occ + '/' + total) + '</span>';
+}
+
+/* ═══════════════════════════════════════════
+   초기 렌더링
+   ═══════════════════════════════════════════ */
+function renderAll() {
+  const tabsEl  = document.getElementById('tabs');
+  const cardsEl = document.getElementById('cards');
+
+  PARLORS.forEach((p, i) => {
+    const occ   = (p.binsos || []).filter(b => b.occ).length;
+    const total = (p.binsos || []).length;
+
+    const tab = document.createElement('button');
+    tab.className = 'tab' + (i === 0 ? ' active' : '');
+    tab.dataset.idx = i;
+    tab.onclick = () => switchTab(i);
+    tab.innerHTML = p.name + ' <span class="cnt">' + (p.updating ? '–' : occ + '/' + total) + '</span>';
+    tabsEl.appendChild(tab);
+
+    const card = document.createElement('div');
+    card.className = 'card' + (i === 0 ? ' show' : '');
+    card.id = 'card-' + i;
+    card.innerHTML = buildCard(p);
+    cardsEl.appendChild(card);
+  });
+}
+
+function buildCard(p) {
+  if (p.updating) {
+    return `
+      <div class="card-top"><h2>${p.name}</h2></div>
+      <div class="notice">
+        <div class="ico warn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h3>빈소현황 업데이트 중</h3>
+        <p>현재 정보가 업데이트 진행 중입니다.<br>잠시 후 다시 확인해 주세요.</p>
+      </div>`;
+  }
+
+  const binsos = p.binsos || [];
+  const occ   = binsos.filter(b => b.occ).length;
+  const emp   = binsos.length - occ;
+
+  let rows = '';
+  binsos.forEach(b => {
+    if (b.occ) {
+      rows += `
+        <div class="binso-row occ">
+          <div class="b-num">
+            <span class="b-label">빈소</span>
+            <span class="b-val">${b.num}</span>
+          </div>
+          <div class="b-info">
+            <div class="b-top">
+              <span class="b-name">${b.name}</span>
+              <span class="badge occ">사용중</span>
+            </div>
+            <div class="b-detail">
+              ${b.place && b.place !== '-' ? `<span class="d">장지 <span class="dv">${b.place}</span></span>` : ''}
+              ${b.checkin && b.checkin !== '-' ? `<span class="d">입관 <span class="dv">${b.checkin}</span></span>` : ''}
+              ${b.checkout && b.checkout !== '-' ? `<span class="d">발인 <span class="dv">${b.checkout}</span></span>` : ''}
+            </div>
+          </div>
+        </div>`;
+    } else {
+      rows += `
+        <div class="binso-row emp">
+          <div class="b-num">
+            <span class="b-label">빈소</span>
+            <span class="b-val">${b.num}</span>
+          </div>
+          <div class="b-info">
+            <div class="b-top">
+              <span class="b-name">빈소 미사용</span>
+              <span class="badge emp">빈소</span>
+            </div>
+          </div>
+        </div>`;
+    }
+  });
+
+  if (binsos.length === 0) {
+    rows = `
+      <div class="notice">
+        <div class="ico load">
+          <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>데이터 로딩 중…</h3>
+        <p>잠시 기다려 주세요.</p>
+      </div>`;
+  }
+
+  return `
+    <div class="card-top">
+      <h2>${p.name}</h2>
+      ${p.tel ? `<span class="tel">📞 <a href="${p.telHref}">${p.tel}</a></span>` : ''}
+    </div>
+    <div class="stat-bar">
+      <span class="s">전체 <strong>${binsos.length}개</strong></span>
+      <span class="s occ">사용중 <strong>${occ}개</strong></span>
+      <span class="s emp">빈소 <strong>${emp}개</strong></span>
+      ${p.origUrl ? `<a href="${p.origUrl}" target="_blank" class="orig">
+        원본 페이지
+        <svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>` : ''}
+    </div>
+    <div class="binso-list">${rows}</div>`;
+}
+
+/* ═══════════════════════════════════════════
+   탭 전환
+   ═══════════════════════════════════════════ */
+function switchTab(idx) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.card').forEach((c, i) => c.classList.toggle('show', i === idx));
+}
+
+/* ═══════════════════════════════════════════
+   초기화
+   ═══════════════════════════════════════════ */
+renderAll();
+updateAll();
+setInterval(updateAll, 600000); // 10분 간격
+</script>
 </body>
 </html>
