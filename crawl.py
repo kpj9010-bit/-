@@ -7,7 +7,7 @@ import urllib.request
 class TableParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.tables = []          # 모든 테이블
+        self.tables = []          # 모든 테이블h
         self.current_table = None
         self.current_row = None
         self.current_cell = None
@@ -201,7 +201,7 @@ def main():
                 'origUrl': origUrl, 'binsos': binsos
             })
             occ = sum(1 for b in binsos if b.get('occ'))
-            print(f"✅ {name}: 사용중 {occ}/{len(binsos)}")
+            print(f"✅ {name}: 사용중 {occ}/{len(binsos)}", file=sys.stderr)
         except Exception as e:
             print(f"❌ {name}: {e}", file=sys.stderr)
             data['parlors'].append({
