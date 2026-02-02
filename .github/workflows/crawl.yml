@@ -1,0 +1,34 @@
+name: 빈소현황 자동 크롤링
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # 매 10분
+  workflow_dispatch:          # 수동 실행도 가능
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 크롤링 실행 및 data.json 생성
+        run: python crawl.py > data.json
+
+      - name: data.json 변경 있으면 커밋
+        run: |
+          git config user.email "bot@github.com"
+          git config user.name "Crawl Bot"
+          git add data.json
+          if git diff --cached --quiet; then
+            echo "변경 없음 - 커밋 안 함"
+          else
+            git commit -m "auto: 빈소현황 업데이트 $(date '+%Y-%m-%d %H:%M' -u)"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
