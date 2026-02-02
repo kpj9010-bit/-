@@ -48,6 +48,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
   <h1>춘천 장례식장 빈소현황</h1>
   <span class="sub">실시간 빈소 현황 확인</span>
 </div>
+
 <div class="tabs">
   <button class="tab active" onclick="switchTab(0)">춘천장례식장</button>
   <button class="tab" onclick="switchTab(1)">강원효장례문화원</button>
@@ -55,6 +56,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
   <button class="tab" onclick="switchTab(3)">강원대학교병원</button>
   <button class="tab" onclick="switchTab(4)">시민장례식장</button>
 </div>
+
 <div class="content">
   <div class="parlor-card show" id="card-0">
     <div class="card-header">
@@ -71,6 +73,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
       <span class="addr">📍 동면 소양강로 409</span>
     </div>
   </div>
+
   <div class="parlor-card" id="card-1">
     <div class="card-header">
       <h2>강원효장례문화원</h2>
@@ -86,6 +89,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
       <span class="addr">📍 동내면 순환대로 877</span>
     </div>
   </div>
+
+  <!-- ✅ 호반은 iframe 대신 "직접 표시" -->
   <div class="parlor-card" id="card-2">
     <div class="card-header">
       <h2>호반병원장례식장</h2>
@@ -94,15 +99,24 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
         <a href="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" target="_blank" class="link-btn">원본 페이지<svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
     </div>
-    <div class="stat-bar" id="hoban-stat" style="display:none;padding:7px 16px;background:#f7f5f2;border-bottom:1px solid #e2ddd7;font-size:.68rem;color:#8c8480">
+
+    <div class="stat-bar" id="hoban-stat" style="display:none;padding:7px 16px;background:#f7f5f2;border-bottom:1px solid #e2ddd7;font-size:.68rem;color:#8c8480;gap:10px">
       <span class="s">전체 <strong id="hoban-total">0</strong>개</span>
       <span class="s" style="color:#2d6b4a">사용중 <strong id="hoban-occ">0</strong>개</span>
+      <span class="s" style="margin-left:auto">
+        <button onclick="loadHoban(true)" style="border:1px solid #e2ddd7;background:#fff;border-radius:10px;padding:4px 10px;font-size:.68rem;cursor:pointer">새로고침</button>
+      </span>
     </div>
-    <div id="hoban-list" style="padding:6px 0;min-height:200px;display:flex;align-items:center;justify-content:center;color:#8c8480">로딩 중...</div>
+
+    <div id="hoban-list" style="padding:6px 0;min-height:200px;display:flex;align-items:center;justify-content:center;color:#8c8480">
+      호반 빈소 불러오는 중...
+    </div>
+
     <div class="card-footer">
       <span class="addr">📍 삼천동 옛경춘로 663</span>
     </div>
   </div>
+
   <div class="parlor-card" id="card-3">
     <div class="card-header">
       <h2>강원대학교병원장례식장</h2>
@@ -118,6 +132,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
       <span class="addr">📍 효자동 백령로 156</span>
     </div>
   </div>
+
   <div class="parlor-card" id="card-4">
     <div class="card-header">
       <h2>춘천 시민장례식장</h2>
@@ -137,59 +152,96 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
     </div>
   </div>
 </div>
+
 <script>
 function switchTab(idx) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.parlor-card').forEach((c, i) => c.classList.toggle('show', i === idx));
+
+  // ✅ 호반 탭 들어올 때만 로드
+  if (idx === 2 && !window.hobanLoaded) {
+    loadHoban(false);
+    window.hobanLoaded = true;
+  }
 }
 
-async function loadHoban() {
+// ✅ 호반 로딩 (프록시 교체 + 파싱 안정화)
+async function loadHoban(force) {
   const list = document.getElementById('hoban-list');
   const stat = document.getElementById('hoban-stat');
-  
+
   try {
     list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">데이터를 불러오는 중...</div>';
-    
-    const proxy = 'https://corsproxy.io/?';
-    const url = encodeURIComponent('http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc');
-    const res = await fetch(proxy + url);
+
+    // ✅ 핵심: corsproxy.io 대신 jina.ai 사용 (CORS/403 우회에 더 잘 맞는 편)
+    // 원본: http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc
+    const proxyBase = 'https://r.jina.ai/http://';
+    const targetPath = 'www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc';
+    const fetchUrl = proxyBase + targetPath;
+
+    const res = await fetch(fetchUrl, { cache: 'no-store' });
+    if (!res.ok) throw new Error('프록시 응답 오류: HTTP ' + res.status);
+
     const html = await res.text();
-    
+
+    // HTML 파싱
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    
-    const tableLinks = doc.querySelectorAll('table a');
-    const binsoMap = new Map();
-    
-    tableLinks.forEach((link) => {
-      const text = link.textContent.trim();
-      
-      if (text.match(/^\d+호/)) {
-        const key = text;
-        if (!binsoMap.has(key)) {
-          binsoMap.set(key, { num: text, name: '', date: '', place: '' });
-        }
-      } else if (binsoMap.size > 0 && text && !text.includes('자 :') && !text.includes('녀 :')) {
-        const lastKey = Array.from(binsoMap.keys()).pop();
-        const entry = binsoMap.get(lastKey);
-        if (!entry.name && text.length < 10 && text.match(/[가-힣]/)) {
-          entry.name = text;
-        } else if (!entry.place && (text.includes('공원') || text.includes('화장장') || text.includes('안식'))) {
-          entry.place = text;
-        } else if (!entry.date && text.includes('월') && text.includes('일')) {
-          entry.date = text;
-        }
-      }
-    });
-    
-    const data = Array.from(binsoMap.values()).filter(b => b.name);
-    
-    if (data.length > 0) {
+
+    // ✅ "빈소현황 테이블" 찾기: th에 '빈소명' & '고인명' 포함된 테이블
+    const tables = Array.from(doc.querySelectorAll('table'));
+    const targetTable = tables.find(t => (t.innerText || '').includes('빈소명') && (t.innerText || '').includes('고인명'));
+
+    if (!targetTable) {
+      stat.style.display = 'none';
+      list.innerHTML =
+        '<div style="padding:40px 20px;text-align:center;color:#c07a2e">빈소현황 표를 찾지 못했습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">원본 페이지 버튼을 눌러 확인해주세요</small></div>';
+      return;
+    }
+
+    const rows = Array.from(targetTable.querySelectorAll('tr')).slice(1); // 헤더 제외
+    const items = rows
+      .map(r => Array.from(r.querySelectorAll('td')).map(td => (td.innerText || '').trim()))
+      .filter(cells => cells.length >= 2 && cells[0].includes('호')); // 빈소명 필터
+
+    if (items.length > 0) {
       stat.style.display = 'flex';
-      document.getElementById('hoban-total').textContent = data.length;
-      document.getElementById('hoban-occ').textContent = data.length;
-      
-      list.innerHTML = data.map(b => '<div style="display:flex;min-height:58px;border-bottom:1px solid #f0ece6"><div style="width:48px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #f0ece6;background:#e6efe9"><span style="font-size:.55rem;font-weight:600;color:#2d6b4a">빈소</span><span style="font-size:.82rem;font-weight:600;color:#2d6b4a;margin-top:1px">' + b.num + '</span></div><div style="flex:1;padding:9px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px"><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:.88rem;font-weight:600">' + b.name + '</span><span style="font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:8px;background:#e6efe9;color:#2d6b4a">사용중</span></div><div style="display:flex;gap:10px;flex-wrap:wrap">' + (b.place ? '<span style="font-size:.68rem;color:#8c8480">장지 <span style="color:#52524e;font-weight:500">' + b.place + '</span></span>' : '') + (b.date ? '<span style="font-size:.68rem;color:#8c8480">일시 <span style="color:#52524e;font-weight:500">' + b.date + '</span></span>' : '') + '</div></div></div>').join('');
+      document.getElementById('hoban-total').textContent = items.length;
+      document.getElementById('hoban-occ').textContent = items.length;
+
+      list.innerHTML = items.map(cells => {
+        const room = cells[0] || '';
+        const deceased = cells[1] || '';
+        const enteredAt = cells[2] || '';
+        const chief = cells[3] || '';
+        const burial = cells[4] || '';
+        const departure = cells[5] || '';
+        const note = cells[6] || '';
+
+        return (
+          '<div style="display:flex;min-height:58px;border-bottom:1px solid #f0ece6">' +
+            '<div style="width:62px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #f0ece6;background:#e6efe9">' +
+              '<span style="font-size:.55rem;font-weight:600;color:#2d6b4a">빈소</span>' +
+              '<span style="font-size:.82rem;font-weight:600;color:#2d6b4a;margin-top:1px">' + room + '</span>' +
+            '</div>' +
+            '<div style="flex:1;padding:9px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px">' +
+              '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+                '<span style="font-size:.90rem;font-weight:700">' + deceased + '</span>' +
+                '<span style="font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:8px;background:#e6efe9;color:#2d6b4a">사용중</span>' +
+              '</div>' +
+              '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+                (enteredAt ? '<span style="font-size:.68rem;color:#8c8480">입관 <span style="color:#52524e;font-weight:500">' + enteredAt + '</span></span>' : '') +
+                (departure ? '<span style="font-size:.68rem;color:#8c8480">발인 <span style="color:#52524e;font-weight:500">' + departure + '</span></span>' : '') +
+              '</div>' +
+              '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+                (chief ? '<span style="font-size:.68rem;color:#8c8480">상주 <span style="color:#52524e;font-weight:500">' + chief + '</span></span>' : '') +
+                (burial ? '<span style="font-size:.68rem;color:#8c8480">장지 <span style="color:#52524e;font-weight:500">' + burial + '</span></span>' : '') +
+                (note ? '<span style="font-size:.68rem;color:#8c8480">비고 <span style="color:#52524e;font-weight:500">' + note + '</span></span>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join('');
     } else {
       stat.style.display = 'none';
       list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">현재 빈소 정보가 없습니다</div>';
@@ -197,18 +249,13 @@ async function loadHoban() {
   } catch (e) {
     console.error('호반 로드 실패:', e);
     stat.style.display = 'none';
-    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">상단 원본 페이지 버튼을 눌러 확인해주세요</small></div>';
+    list.innerHTML =
+      '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">상단 원본 페이지 버튼을 눌러 확인해주세요</small></div>';
   }
 }
 
-const originalSwitch = switchTab;
-switchTab = function(idx) {
-  originalSwitch(idx);
-  if (idx === 2 && !window.hobanLoaded) {
-    loadHoban();
-    window.hobanLoaded = true;
-  }
-};
+// 첫 화면 기본 탭
+switchTab(0);
 </script>
 </body>
 </html>
