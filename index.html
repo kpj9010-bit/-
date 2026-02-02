@@ -103,20 +103,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
       <span class="addr">📍 삼천동 옛경춘로 663</span>
     </div>
   </div>
-    <div class="card-header">
-      <h2>호반병원장례식장</h2>
-      <div class="info">
-        <span class="tel">📞 <a href="tel:03325200046">033-252-0046</a></span>
-        <a href="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" target="_blank" class="link-btn">원본 페이지<svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-      </div>
-    </div>
-    <div class="iframe-wrap">
-      <iframe src="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" scrolling="yes"></iframe>
-    </div>
-    <div class="card-footer">
-      <span class="addr">📍 삼천동 옛경춘로 663</span>
-    </div>
-  </div>
   <div class="parlor-card" id="card-3">
     <div class="card-header">
       <h2>강원대학교병원장례식장</h2>
@@ -156,7 +142,8 @@ function switchTab(idx) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.parlor-card').forEach((c, i) => c.classList.toggle('show', i === idx));
 }
-  async function loadHoban() {
+
+async function loadHoban() {
   const list = document.getElementById('hoban-list');
   const stat = document.getElementById('hoban-stat');
   
@@ -172,58 +159,38 @@ function switchTab(idx) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     
-    const data = [];
-    const rows = doc.querySelectorAll('table tbody tr');
+    const tableLinks = doc.querySelectorAll('table a');
+    const binsoMap = new Map();
     
-    rows.forEach((tr, idx) => {
-      const cells = tr.querySelectorAll('td');
-      if (cells.length >= 4) {
-        const binsoText = cells[0]?.textContent?.trim() || '';
-        const nameText = cells[1]?.textContent?.trim() || '';
-        const dateText = cells[2]?.textContent?.trim() || '';
-        const placeText = cells[3]?.textContent?.trim() || '';
-        
-        if (binsoText && nameText && !binsoText.includes('빈소명') && binsoText.match(/\d/)) {
-          const detailsDiv = cells[1]?.querySelector('div');
-          let details = '';
-          if (detailsDiv) {
-            details = detailsDiv.textContent.trim();
-          }
-          
-          data.push({
-            num: binsoText,
-            name: nameText.split('\n')[0].trim(),
-            date: dateText,
-            place: placeText,
-            details: details
-          });
+    tableLinks.forEach((link) => {
+      const text = link.textContent.trim();
+      
+      if (text.match(/^\d+호/)) {
+        const key = text;
+        if (!binsoMap.has(key)) {
+          binsoMap.set(key, { num: text, name: '', date: '', place: '' });
+        }
+      } else if (binsoMap.size > 0 && text && !text.includes('자 :') && !text.includes('녀 :')) {
+        const lastKey = Array.from(binsoMap.keys()).pop();
+        const entry = binsoMap.get(lastKey);
+        if (!entry.name && text.length < 10 && text.match(/[가-힣]/)) {
+          entry.name = text;
+        } else if (!entry.place && (text.includes('공원') || text.includes('화장장') || text.includes('안식'))) {
+          entry.place = text;
+        } else if (!entry.date && text.includes('월') && text.includes('일')) {
+          entry.date = text;
         }
       }
     });
+    
+    const data = Array.from(binsoMap.values()).filter(b => b.name);
     
     if (data.length > 0) {
       stat.style.display = 'flex';
       document.getElementById('hoban-total').textContent = data.length;
       document.getElementById('hoban-occ').textContent = data.length;
       
-      list.innerHTML = data.map(b => `
-        <div style="display:flex;min-height:58px;border-bottom:1px solid #f0ece6">
-          <div style="width:48px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #f0ece6;background:#e6efe9">
-            <span style="font-size:.55rem;font-weight:600;color:#2d6b4a">빈소</span>
-            <span style="font-size:.82rem;font-weight:600;color:#2d6b4a;margin-top:1px">${b.num}</span>
-          </div>
-          <div style="flex:1;padding:9px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <span style="font-size:.88rem;font-weight:600">${b.name}</span>
-              <span style="font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:8px;background:#e6efe9;color:#2d6b4a">사용중</span>
-            </div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
-              ${b.place ? `<span style="font-size:.68rem;color:#8c8480">장지 <span style="color:#52524e;font-weight:500">${b.place}</span></span>` : ''}
-              ${b.date ? `<span style="font-size:.68rem;color:#8c8480">일시 <span style="color:#52524e;font-weight:500">${b.date}</span></span>` : ''}
-            </div>
-          </div>
-        </div>
-      `).join('');
+      list.innerHTML = data.map(b => '<div style="display:flex;min-height:58px;border-bottom:1px solid #f0ece6"><div style="width:48px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #f0ece6;background:#e6efe9"><span style="font-size:.55rem;font-weight:600;color:#2d6b4a">빈소</span><span style="font-size:.82rem;font-weight:600;color:#2d6b4a;margin-top:1px">' + b.num + '</span></div><div style="flex:1;padding:9px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px"><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:.88rem;font-weight:600">' + b.name + '</span><span style="font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:8px;background:#e6efe9;color:#2d6b4a">사용중</span></div><div style="display:flex;gap:10px;flex-wrap:wrap">' + (b.place ? '<span style="font-size:.68rem;color:#8c8480">장지 <span style="color:#52524e;font-weight:500">' + b.place + '</span></span>' : '') + (b.date ? '<span style="font-size:.68rem;color:#8c8480">일시 <span style="color:#52524e;font-weight:500">' + b.date + '</span></span>' : '') + '</div></div></div>').join('');
     } else {
       stat.style.display = 'none';
       list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">현재 빈소 정보가 없습니다</div>';
@@ -231,7 +198,7 @@ function switchTab(idx) {
   } catch (e) {
     console.error('호반 로드 실패:', e);
     stat.style.display = 'none';
-    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">상단 \'원본 페이지\' 버튼을 눌러 확인해주세요</small></div>';
+    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">상단 원본 페이지 버튼을 눌러 확인해주세요</small></div>';
   }
 }
 
@@ -246,5 +213,3 @@ switchTab = function(idx) {
 </script>
 </body>
 </html>
-
-
