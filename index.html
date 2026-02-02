@@ -150,11 +150,10 @@ async function loadHoban() {
   try {
     list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">데이터를 불러오는 중...</div>';
     
-    const proxy = 'https://api.allorigins.win/get?url=';
+    const proxy = 'https://corsproxy.io/?';
     const url = encodeURIComponent('http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc');
     const res = await fetch(proxy + url);
-    const json = await res.json();
-    const html = json.contents;
+    const html = await res.text();
     
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
