@@ -157,34 +157,49 @@ function switchTab(idx) {
   document.querySelectorAll('.parlor-card').forEach((c, i) => c.classList.toggle('show', i === idx));
 }
   async function loadHoban() {
+  const list = document.getElementById('hoban-list');
+  const stat = document.getElementById('hoban-stat');
+  
   try {
-    const proxy = 'https://api.allorigins.win/raw?url=';
+    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">데이터를 불러오는 중...</div>';
+    
+    const proxy = 'https://api.allorigins.win/get?url=';
     const url = encodeURIComponent('http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc');
     const res = await fetch(proxy + url);
-    const html = await res.text();
+    const json = await res.json();
+    const html = json.contents;
     
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
-    const rows = doc.querySelectorAll('table tr');
     
     const data = [];
-    rows.forEach(tr => {
-      const cells = Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim());
-      if (cells.length >= 6 && cells[0] && cells[1] && !cells[0].includes('빈소명')) {
-        let num = cells[0];
-        if (num === '1호') num = '1호(특실)';
-        data.push({
-          num: num,
-          name: cells[1],
-          checkin: cells[2],
-          place: cells[4],
-          checkout: cells[5]
-        });
+    const rows = doc.querySelectorAll('table tbody tr');
+    
+    rows.forEach((tr, idx) => {
+      const cells = tr.querySelectorAll('td');
+      if (cells.length >= 4) {
+        const binsoText = cells[0]?.textContent?.trim() || '';
+        const nameText = cells[1]?.textContent?.trim() || '';
+        const dateText = cells[2]?.textContent?.trim() || '';
+        const placeText = cells[3]?.textContent?.trim() || '';
+        
+        if (binsoText && nameText && !binsoText.includes('빈소명') && binsoText.match(/\d/)) {
+          const detailsDiv = cells[1]?.querySelector('div');
+          let details = '';
+          if (detailsDiv) {
+            details = detailsDiv.textContent.trim();
+          }
+          
+          data.push({
+            num: binsoText,
+            name: nameText.split('\n')[0].trim(),
+            date: dateText,
+            place: placeText,
+            details: details
+          });
+        }
       }
     });
-    
-    const list = document.getElementById('hoban-list');
-    const stat = document.getElementById('hoban-stat');
     
     if (data.length > 0) {
       stat.style.display = 'flex';
@@ -204,18 +219,19 @@ function switchTab(idx) {
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               ${b.place ? `<span style="font-size:.68rem;color:#8c8480">장지 <span style="color:#52524e;font-weight:500">${b.place}</span></span>` : ''}
-              ${b.checkin ? `<span style="font-size:.68rem;color:#8c8480">입관 <span style="color:#52524e;font-weight:500">${b.checkin}</span></span>` : ''}
-              ${b.checkout ? `<span style="font-size:.68rem;color:#8c8480">발인 <span style="color:#52524e;font-weight:500">${b.checkout}</span></span>` : ''}
+              ${b.date ? `<span style="font-size:.68rem;color:#8c8480">일시 <span style="color:#52524e;font-weight:500">${b.date}</span></span>` : ''}
             </div>
           </div>
         </div>
       `).join('');
     } else {
-      list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">빈소 정보가 없습니다</div>';
+      stat.style.display = 'none';
+      list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">현재 빈소 정보가 없습니다</div>';
     }
   } catch (e) {
     console.error('호반 로드 실패:', e);
-    document.getElementById('hoban-list').innerHTML = '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다</div>';
+    stat.style.display = 'none';
+    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">상단 \'원본 페이지\' 버튼을 눌러 확인해주세요</small></div>';
   }
 }
 
@@ -230,4 +246,5 @@ switchTab = function(idx) {
 </script>
 </body>
 </html>
+
 
