@@ -51,37 +51,28 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 .updating h3{font-size:.92rem;font-weight:600;margin-bottom:6px}
 .updating p{font-size:.78rem;color:var(--t3);line-height:1.6}
 
-/* ✅ 호반 로드 실패 시 자동 안내 */
-.fallback-overlay{
-  position:absolute; inset:0;
-  display:none;
-  align-items:center; justify-content:center;
-  padding:18px;
-  background:linear-gradient(180deg, rgba(250,248,245,.96), rgba(250,248,245,.98));
+/* ✅ 호반 JSON 표시 영역 */
+.hoban-meta{font-size:.72rem;color:var(--t3);margin-bottom:10px}
+.hoban-list{display:flex;flex-direction:column;gap:10px}
+.hoban-item{
+  background:#fff;border:1px solid var(--border);border-radius:12px;
+  padding:12px;box-shadow:0 1px 10px rgba(0,0,0,.04);
 }
-.fallback-box{
-  width:100%;
-  max-width:520px;
-  background:#fff;
-  border:1px solid var(--border);
-  border-radius:12px;
-  box-shadow:0 2px 14px rgba(0,0,0,.06);
-  padding:18px 16px;
-  text-align:center;
+.hoban-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.hoban-room{font-weight:800;color:var(--t1)}
+.hoban-memo{font-size:.72rem;color:var(--t3)}
+.hoban-name{margin-top:6px;font-size:.9rem;font-weight:700}
+.hoban-sub{margin-top:6px;font-size:.76rem;color:var(--t2);line-height:1.5}
+.hoban-error{
+  display:none;margin-top:12px;padding:12px;border:1px solid var(--border);
+  border-radius:10px;background:#fff;
 }
-.fallback-box .title{font-family:'Noto Serif KR',serif;font-weight:700;font-size:.98rem;margin-bottom:8px}
-.fallback-box .desc{font-size:.82rem;color:var(--t3);line-height:1.55;margin-bottom:14px}
-.fallback-box .btn{
-  display:inline-block;
-  background:var(--accent);
-  color:#fff;
-  padding:12px 18px;
-  border-radius:10px;
-  text-decoration:none;
-  font-weight:700;
-  font-size:.9rem;
+.hoban-error .t{font-weight:700;margin-bottom:6px}
+.hoban-error .d{font-size:.82rem;color:var(--t3);line-height:1.55}
+.hoban-error a{
+  display:inline-block;margin-top:10px;background:var(--accent);color:#fff;
+  padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:700;
 }
-.fallback-box .mini{margin-top:10px;font-size:.72rem;color:var(--t3)}
 
 @media(max-width:500px){
   .header{padding:16px 14px 14px}
@@ -148,14 +139,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
     </div>
   </div>
 
-  <!-- 2. 호반병원장례식장 (✅ HTTPS로 “페이지 안에서 바로 보이게” 구성) -->
+  <!-- 2. 호반병원장례식장 (✅ data.json 표시) -->
   <div class="parlor-card" id="card-2">
     <div class="card-header">
       <h2>호반병원장례식장</h2>
       <div class="info">
         <span class="tel">📞 <a href="tel:033-252-0046">033-252-0046</a></span>
-
-        <!-- 원본 페이지 (HTTPS) -->
         <a href="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
            target="_blank" class="link-btn">
           원본 페이지
@@ -164,29 +153,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
       </div>
     </div>
 
-    <div class="iframe-wrap" id="hobanWrap">
-      <iframe
-        id="hobanFrame"
-        src="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
-        scrolling="yes"
-      ></iframe>
+    <div class="iframe-wrap" style="padding:12px;min-height:320px">
+      <div class="hoban-meta" id="hobanMeta">호반 빈소현황 불러오는 중...</div>
+      <div class="hoban-list" id="hobanList"></div>
 
-      <!-- ✅ 호반 사이트가 점검/다운이면 자동으로 안내 표시 -->
-      <div class="fallback-overlay" id="hobanFallback">
-        <div class="fallback-box">
-          <div class="title">호반 빈소현황 연결이 원활하지 않습니다</div>
-          <div class="desc">
-            현재 호반 홈페이지 점검/접속 문제로<br>
-            빈소현황이 페이지 안에 표시되지 않을 수 있습니다.<br>
-            아래 버튼으로 바로 열어 확인해 주세요.
-          </div>
-          <a class="btn"
-             href="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
-             target="_blank" rel="noopener">
-            👉 호반 빈소현황 열기
-          </a>
-          <div class="mini">※ 홈페이지가 정상화되면 자동으로 페이지 안에 표시됩니다.</div>
-        </div>
+      <div class="hoban-error" id="hobanError">
+        <div class="t">호반 빈소현황을 불러오지 못했습니다.</div>
+        <div class="d">잠시 후 다시 시도해 주세요.</div>
+        <a href="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
+           target="_blank" rel="noopener">👉 원본 페이지 열기</a>
       </div>
     </div>
 
@@ -241,45 +216,76 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 function switchTab(idx) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.parlor-card').forEach((c, i) => c.classList.toggle('show', i === idx));
-  if (idx === 2) armHobanFailover(); // 호반 탭일 때만 상태 점검
+  if (idx === 2) loadHobanData(); // ✅ 호반 탭에서 data.json 로드
 }
 
-// ✅ 호반 iframe 로드 실패 감지(보험)
-let hobanLoaded = false;
-let hobanTimer = null;
+// ✅ 호반 data.json 로드 + 렌더
+async function loadHobanData(){
+  const meta = document.getElementById('hobanMeta');
+  const list = document.getElementById('hobanList');
+  const err  = document.getElementById('hobanError');
 
-function showHobanFallback(show){
-  const el = document.getElementById('hobanFallback');
-  if (!el) return;
-  el.style.display = show ? 'flex' : 'none';
+  if (!meta || !list || !err) return;
+
+  err.style.display = 'none';
+  meta.textContent = '호반 빈소현황 불러오는 중...';
+  list.innerHTML = '';
+
+  try{
+    // ✅ 이미 확인하신 data.json을 그대로 읽습니다
+    const res = await fetch('./data.json?ts=' + Date.now(), { cache: 'no-store' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    const updatedAt = data.updatedAt || data.updated_at || data.time || '알 수 없음';
+    let rows = data.rows || data.data || data.items || data.list || data.result || [];
+    if (!Array.isArray(rows)) rows = [];
+
+    meta.textContent = `업데이트: ${updatedAt} / 총 ${rows.length}건`;
+
+    if(rows.length === 0){
+      list.innerHTML = `<div class="hoban-item" style="color:var(--t3);font-size:.82rem;">
+        현재 표시할 빈소 정보가 없습니다.
+      </div>`;
+      return;
+    }
+
+    rows.forEach((r) => {
+      const room   = r.room || r.hall || r["빈소"] || r["호실"] || '';
+      const name   = r.name || r.deceased || r["고인"] || r["고인명"] || '';
+      const death  = r.death || r["별세"] || r["입관"] || '';
+      const coffin = r.coffin || r["발인"] || r["입관/발인"] || '';
+      const memo   = r.memo || r.family || r["상주"] || r["비고"] || '';
+
+      const div = document.createElement('div');
+      div.className = 'hoban-item';
+      div.innerHTML = `
+        <div class="hoban-top">
+          <div class="hoban-room">${room}</div>
+          <div class="hoban-memo">${memo}</div>
+        </div>
+        <div class="hoban-name">${name}</div>
+        <div class="hoban-sub">
+          ${death ? `정보: ${death}<br>` : ``}
+          ${coffin ? `일정: ${coffin}` : ``}
+        </div>
+      `;
+      list.appendChild(div);
+    });
+
+  }catch(e){
+    meta.textContent = '업데이트 정보를 불러오지 못했습니다.';
+    err.style.display = 'block';
+  }
 }
 
-function armHobanFailover(){
-  hobanLoaded = false;
-  showHobanFallback(false);
-
-  const frame = document.getElementById('hobanFrame');
-  if (!frame) return;
-
-  frame.onload = () => {
-    hobanLoaded = true;
-    showHobanFallback(false);
-  };
-
-  if (hobanTimer) clearTimeout(hobanTimer);
-  hobanTimer = setTimeout(() => {
-    if (!hobanLoaded) showHobanFallback(true);
-  }, 5000);
-}
-
-// ✅ 10분마다 “현재 보고 있는 탭” 자동 새로고침
+// ✅ 10분마다 현재 탭 자동 새로고침 + 호반이면 재로딩
 setInterval(() => {
   const visible = document.querySelector('.parlor-card.show iframe');
   if (visible) visible.src = visible.src;
 
-  // 호반 탭을 보고 있다면, 새로고침 후 상태 점검도 다시
   const hobanCard = document.getElementById('card-2');
-  if (hobanCard && hobanCard.classList.contains('show')) armHobanFailover();
+  if (hobanCard && hobanCard.classList.contains('show')) loadHobanData();
 }, 600000);
 </script>
 
