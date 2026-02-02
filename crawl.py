@@ -2,7 +2,8 @@ import json, re, sys
 from datetime import datetime
 from html.parser import HTMLParser
 import urllib.request
-
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 # ─── HTML 테이블 파싱기 ───────────────────────────────
 class TableParser(HTMLParser):
     def __init__(self):
@@ -45,7 +46,8 @@ def parse_tables(html):
 
 def fetch(url):
     req = urllib.request.Request(url, headers={
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Referer': url
     })
     with urllib.request.urlopen(req, timeout=15) as res:
         return res.read().decode('utf-8', errors='replace')
