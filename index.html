@@ -40,6 +40,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 .updating .icon svg{width:24px;height:24px;color:#d4883a}
 .updating h3{font-size:.92rem;font-weight:600;margin-bottom:6px}
 .updating p{font-size:.78rem;color:var(--t3);line-height:1.6}
+.small{font-size:.65rem;color:var(--t3);line-height:1.45}
 @media(max-width:500px){.header{padding:16px 14px 14px}.header h1{font-size:1.1rem}.card-header{flex-direction:column;align-items:flex-start;gap:6px;padding:12px 14px 10px}.card-header .info{align-items:flex-start}}
 </style>
 </head>
@@ -90,7 +91,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
     </div>
   </div>
 
-  <!-- ✅ 호반은 iframe 대신 "직접 표시" -->
+  <!-- ✅ 호반은 직접 표시 -->
   <div class="parlor-card" id="card-2">
     <div class="card-header">
       <h2>호반병원장례식장</h2>
@@ -100,17 +101,23 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
       </div>
     </div>
 
-    <div class="stat-bar" id="hoban-stat" style="display:none;padding:7px 16px;background:#f7f5f2;border-bottom:1px solid #e2ddd7;font-size:.68rem;color:#8c8480;gap:10px">
-      <span class="s">전체 <strong id="hoban-total">0</strong>개</span>
-      <span class="s" style="color:#2d6b4a">사용중 <strong id="hoban-occ">0</strong>개</span>
-      <span class="s" style="margin-left:auto">
+    <div id="hoban-stat" style="display:none;padding:7px 16px;background:#f7f5f2;border-bottom:1px solid #e2ddd7;font-size:.68rem;color:#8c8480;gap:10px">
+      <span>전체 <strong id="hoban-total">0</strong>개</span>
+      <span style="color:#2d6b4a">표시 <strong id="hoban-occ">0</strong>개</span>
+      <span style="margin-left:auto;display:flex;gap:6px;align-items:center">
         <button onclick="loadHoban(true)" style="border:1px solid #e2ddd7;background:#fff;border-radius:10px;padding:4px 10px;font-size:.68rem;cursor:pointer">새로고침</button>
+        <a id="hoban-debug-open" target="_blank" rel="noopener"
+           style="border:1px solid #e2ddd7;background:#fff;border-radius:10px;padding:4px 10px;font-size:.68rem;color:#374151;text-decoration:none;display:none">
+          원본(프록시)보기
+        </a>
       </span>
     </div>
 
-    <div id="hoban-list" style="padding:6px 0;min-height:200px;display:flex;align-items:center;justify-content:center;color:#8c8480">
+    <div id="hoban-list" style="padding:10px 0;min-height:220px;display:flex;align-items:center;justify-content:center;color:#8c8480">
       호반 빈소 불러오는 중...
     </div>
+
+    <div id="hoban-debug" class="small" style="padding:10px 16px;border-top:1px solid #f0ece6;background:#fffdf9;display:none"></div>
 
     <div class="card-footer">
       <span class="addr">📍 삼천동 옛경춘로 663</span>
@@ -157,104 +164,201 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 function switchTab(idx) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.parlor-card').forEach((c, i) => c.classList.toggle('show', i === idx));
-
-  // ✅ 호반 탭 들어올 때만 로드
   if (idx === 2 && !window.hobanLoaded) {
     loadHoban(false);
     window.hobanLoaded = true;
   }
 }
 
-// ✅ 호반 로딩 (프록시 교체 + 파싱 안정화)
+function setDebug(msg, showOpenUrl) {
+  const d = document.getElementById('hoban-debug');
+  d.style.display = 'block';
+  d.innerHTML = msg;
+  const a = document.getElementById('hoban-debug-open');
+  if (showOpenUrl) {
+    a.href = showOpenUrl;
+    a.style.display = 'inline-block';
+  } else {
+    a.style.display = 'none';
+  }
+}
+
+// ✅ 프록시 여러 개 자동 시도
+async function fetchViaProxies(targetUrl) {
+  const urlNoProto = targetUrl.replace(/^https?:\/\//, '');
+
+  const proxyList = [
+    { name: 'allorigins', make: (u) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u) },
+    { name: 'corsproxy.io', make: (u) => 'https://corsproxy.io/?' + encodeURIComponent(u) },
+    { name: 'thingproxy', make: (u) => 'https://thingproxy.freeboard.io/fetch/' + u },
+    { name: 'jina', make: (u) => 'https://r.jina.ai/http://' + urlNoProto },
+  ];
+
+  const errors = [];
+  for (const p of proxyList) {
+    const fetchUrl = p.make(targetUrl);
+    try {
+      const res = await fetch(fetchUrl, { cache: 'no-store' });
+      const text = await res.text();
+
+      // 차단/에러 페이지 필터
+      const head = (text || '').slice(0, 400);
+      const looksForbidden =
+        head.includes('403 Forbidden') ||
+        head.includes('Forbidden') ||
+        head.includes('Access denied') ||
+        head.includes('captcha') ||
+        head.includes('You don\'t have permission');
+
+      if (!res.ok || looksForbidden) {
+        errors.push(`${p.name}: HTTP ${res.status} (차단/거부 가능)`);
+        continue;
+      }
+
+      // table 존재 여부 검사
+      if (!text.includes('<table')) {
+        errors.push(`${p.name}: table 없음(변환/텍스트 응답일 수 있음)`);
+        continue;
+      }
+
+      return { ok: true, proxyName: p.name, fetchUrl, text, errors };
+    } catch (e) {
+      errors.push(`${p.name}: ${e?.message || e}`);
+    }
+  }
+  return { ok: false, errors };
+}
+
+function extractLikelyHtml(raw) {
+  if (!raw) return '';
+  let s = raw;
+
+  // r.jina.ai 등에서 앞에 설명 텍스트가 붙는 경우, HTML 시작점부터 잘라냄
+  const i1 = s.indexOf('<!DOCTYPE');
+  const i2 = s.indexOf('<html');
+  const i3 = s.indexOf('<table');
+  const start = [i1, i2, i3].filter(i => i >= 0).sort((a,b)=>a-b)[0];
+  if (start >= 0) s = s.slice(start);
+
+  // table로 시작하면 html/body로 감싸기
+  if (s.startsWith('<table')) {
+    s = '<html><body>' + s + '</body></html>';
+  }
+  return s;
+}
+
+// ✅ 호반 로딩
 async function loadHoban(force) {
   const list = document.getElementById('hoban-list');
   const stat = document.getElementById('hoban-stat');
 
-  try {
-    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">데이터를 불러오는 중...</div>';
+  list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">데이터를 불러오는 중...</div>';
+  setDebug('', null);
+  document.getElementById('hoban-debug').style.display = 'none';
 
-    // ✅ 핵심: corsproxy.io 대신 jina.ai 사용 (CORS/403 우회에 더 잘 맞는 편)
-    // 원본: http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc
-    const proxyBase = 'https://r.jina.ai/http://';
-    const targetPath = 'www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc';
-    const fetchUrl = proxyBase + targetPath;
+  const target = 'http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc';
 
-    const res = await fetch(fetchUrl, { cache: 'no-store' });
-    if (!res.ok) throw new Error('프록시 응답 오류: HTTP ' + res.status);
+  const result = await fetchViaProxies(target);
 
-    const html = await res.text();
-
-    // HTML 파싱
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    // ✅ "빈소현황 테이블" 찾기: th에 '빈소명' & '고인명' 포함된 테이블
-    const tables = Array.from(doc.querySelectorAll('table'));
-    const targetTable = tables.find(t => (t.innerText || '').includes('빈소명') && (t.innerText || '').includes('고인명'));
-
-    if (!targetTable) {
-      stat.style.display = 'none';
-      list.innerHTML =
-        '<div style="padding:40px 20px;text-align:center;color:#c07a2e">빈소현황 표를 찾지 못했습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">원본 페이지 버튼을 눌러 확인해주세요</small></div>';
-      return;
-    }
-
-    const rows = Array.from(targetTable.querySelectorAll('tr')).slice(1); // 헤더 제외
-    const items = rows
-      .map(r => Array.from(r.querySelectorAll('td')).map(td => (td.innerText || '').trim()))
-      .filter(cells => cells.length >= 2 && cells[0].includes('호')); // 빈소명 필터
-
-    if (items.length > 0) {
-      stat.style.display = 'flex';
-      document.getElementById('hoban-total').textContent = items.length;
-      document.getElementById('hoban-occ').textContent = items.length;
-
-      list.innerHTML = items.map(cells => {
-        const room = cells[0] || '';
-        const deceased = cells[1] || '';
-        const enteredAt = cells[2] || '';
-        const chief = cells[3] || '';
-        const burial = cells[4] || '';
-        const departure = cells[5] || '';
-        const note = cells[6] || '';
-
-        return (
-          '<div style="display:flex;min-height:58px;border-bottom:1px solid #f0ece6">' +
-            '<div style="width:62px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #f0ece6;background:#e6efe9">' +
-              '<span style="font-size:.55rem;font-weight:600;color:#2d6b4a">빈소</span>' +
-              '<span style="font-size:.82rem;font-weight:600;color:#2d6b4a;margin-top:1px">' + room + '</span>' +
-            '</div>' +
-            '<div style="flex:1;padding:9px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px">' +
-              '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
-                '<span style="font-size:.90rem;font-weight:700">' + deceased + '</span>' +
-                '<span style="font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:8px;background:#e6efe9;color:#2d6b4a">사용중</span>' +
-              '</div>' +
-              '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
-                (enteredAt ? '<span style="font-size:.68rem;color:#8c8480">입관 <span style="color:#52524e;font-weight:500">' + enteredAt + '</span></span>' : '') +
-                (departure ? '<span style="font-size:.68rem;color:#8c8480">발인 <span style="color:#52524e;font-weight:500">' + departure + '</span></span>' : '') +
-              '</div>' +
-              '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
-                (chief ? '<span style="font-size:.68rem;color:#8c8480">상주 <span style="color:#52524e;font-weight:500">' + chief + '</span></span>' : '') +
-                (burial ? '<span style="font-size:.68rem;color:#8c8480">장지 <span style="color:#52524e;font-weight:500">' + burial + '</span></span>' : '') +
-                (note ? '<span style="font-size:.68rem;color:#8c8480">비고 <span style="color:#52524e;font-weight:500">' + note + '</span></span>' : '') +
-              '</div>' +
-            '</div>' +
-          '</div>'
-        );
-      }).join('');
-    } else {
-      stat.style.display = 'none';
-      list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">현재 빈소 정보가 없습니다</div>';
-    }
-  } catch (e) {
-    console.error('호반 로드 실패:', e);
+  if (!result.ok) {
     stat.style.display = 'none';
     list.innerHTML =
-      '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">상단 원본 페이지 버튼을 눌러 확인해주세요</small></div>';
+      '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">원본 페이지 버튼을 눌러 확인해주세요</small></div>';
+    setDebug(
+      '프록시가 전부 실패했습니다.<br>' +
+      result.errors.map(e => '• ' + e).join('<br>'),
+      null
+    );
+    return;
   }
+
+  const html = extractLikelyHtml(result.text);
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+
+  // 테이블 탐색(공백 제거 후 검사)
+  const tables = Array.from(doc.querySelectorAll('table'));
+  const targetTable = tables.find(t => {
+    const norm = (t.innerText || '').replace(/\s+/g, '');
+    return norm.includes('빈소명') && norm.includes('고인명');
+  });
+
+  if (!targetTable) {
+    stat.style.display = 'none';
+    list.innerHTML =
+      '<div style="padding:40px 20px;text-align:center;color:#c07a2e">빈소현황 표를 찾지 못했습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">원본(프록시)보기로 실제 응답을 확인해주세요</small></div>';
+    setDebug(
+      `프록시 성공: <b>${result.proxyName}</b><br>` +
+      `하지만 표를 못 찾았습니다. (테이블 ${tables.length}개)<br>` +
+      `• 실패 내역:<br>${result.errors.map(e => ' - ' + e).join('<br>')}`,
+      result.fetchUrl
+    );
+    return;
+  }
+
+  const rows = Array.from(targetTable.querySelectorAll('tr')).slice(1);
+  const items = rows
+    .map(r => Array.from(r.querySelectorAll('td')).map(td => (td.innerText || '').trim()))
+    .filter(cells => cells.length >= 2 && (cells[0] || '').includes('호'));
+
+  if (items.length === 0) {
+    stat.style.display = 'none';
+    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:#8c8480">현재 빈소 정보가 없습니다</div>';
+    setDebug(
+      `프록시 성공: <b>${result.proxyName}</b><br>` +
+      `표는 찾았는데, 데이터 행이 비어 있습니다.<br>` +
+      `원본(프록시)보기로 응답 HTML 확인 가능`,
+      result.fetchUrl
+    );
+    return;
+  }
+
+  stat.style.display = 'flex';
+  document.getElementById('hoban-total').textContent = items.length;
+  document.getElementById('hoban-occ').textContent = items.length;
+
+  list.innerHTML = items.map(cells => {
+    const room = cells[0] || '';
+    const deceased = cells[1] || '';
+    const enteredAt = cells[2] || '';
+    const chief = cells[3] || '';
+    const burial = cells[4] || '';
+    const departure = cells[5] || '';
+    const note = cells[6] || '';
+
+    return (
+      '<div style="display:flex;min-height:58px;border-bottom:1px solid #f0ece6">' +
+        '<div style="width:62px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #f0ece6;background:#e6efe9">' +
+          '<span style="font-size:.55rem;font-weight:600;color:#2d6b4a">빈소</span>' +
+          '<span style="font-size:.82rem;font-weight:600;color:#2d6b4a;margin-top:1px">' + room + '</span>' +
+        '</div>' +
+        '<div style="flex:1;padding:9px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+            '<span style="font-size:.90rem;font-weight:700">' + deceased + '</span>' +
+            '<span style="font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:8px;background:#e6efe9;color:#2d6b4a">사용중</span>' +
+          '</div>' +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+            (enteredAt ? '<span style="font-size:.68rem;color:#8c8480">입관 <span style="color:#52524e;font-weight:500">' + enteredAt + '</span></span>' : '') +
+            (departure ? '<span style="font-size:.68rem;color:#8c8480">발인 <span style="color:#52524e;font-weight:500">' + departure + '</span></span>' : '') +
+          '</div>' +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap">' +
+            (chief ? '<span style="font-size:.68rem;color:#8c8480">상주 <span style="color:#52524e;font-weight:500">' + chief + '</span></span>' : '') +
+            (burial ? '<span style="font-size:.68rem;color:#8c8480">장지 <span style="color:#52524e;font-weight:500">' + burial + '</span></span>' : '') +
+            (note ? '<span style="font-size:.68rem;color:#8c8480">비고 <span style="color:#52524e;font-weight:500">' + note + '</span></span>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+
+  setDebug(
+    `성공: <b>${result.proxyName}</b> 로 불러왔습니다.<br>` +
+    `• 실패 내역:<br>${result.errors.map(e => ' - ' + e).join('<br>')}`,
+    result.fetchUrl
+  );
 }
 
-// 첫 화면 기본 탭
 switchTab(0);
 </script>
 </body>
