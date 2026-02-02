@@ -51,15 +51,17 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 .updating h3{font-size:.92rem;font-weight:600;margin-bottom:6px}
 .updating p{font-size:.78rem;color:var(--t3);line-height:1.6}
 
-/* ✅ 호반 iframe 실패 시 안내(자동) */
-.fallback{
+/* ✅ 호반 로드 실패 시 자동 안내 */
+.fallback-overlay{
   position:absolute; inset:0;
-  display:none; align-items:center; justify-content:center;
+  display:none;
+  align-items:center; justify-content:center;
   padding:18px;
   background:linear-gradient(180deg, rgba(250,248,245,.96), rgba(250,248,245,.98));
 }
-.fallback .box{
-  width:100%; max-width:520px;
+.fallback-box{
+  width:100%;
+  max-width:520px;
   background:#fff;
   border:1px solid var(--border);
   border-radius:12px;
@@ -67,9 +69,9 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
   padding:18px 16px;
   text-align:center;
 }
-.fallback .title{font-family:'Noto Serif KR',serif;font-weight:700;font-size:.98rem;margin-bottom:8px}
-.fallback .desc{font-size:.82rem;color:var(--t3);line-height:1.55;margin-bottom:14px}
-.fallback .btn{
+.fallback-box .title{font-family:'Noto Serif KR',serif;font-weight:700;font-size:.98rem;margin-bottom:8px}
+.fallback-box .desc{font-size:.82rem;color:var(--t3);line-height:1.55;margin-bottom:14px}
+.fallback-box .btn{
   display:inline-block;
   background:var(--accent);
   color:#fff;
@@ -79,7 +81,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
   font-weight:700;
   font-size:.9rem;
 }
-.fallback .mini{margin-top:10px;font-size:.72rem;color:var(--t3)}
+.fallback-box .mini{margin-top:10px;font-size:.72rem;color:var(--t3)}
 
 @media(max-width:500px){
   .header{padding:16px 14px 14px}
@@ -105,6 +107,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 </div>
 
 <div class="content">
+
   <!-- 0. 춘천장례식장 -->
   <div class="parlor-card show" id="card-0">
     <div class="card-header">
@@ -145,15 +148,16 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
     </div>
   </div>
 
-  <!-- 2. 호반병원장례식장 (✅ HTTPS 빈소현황 iframe로 바로 표시) -->
+  <!-- 2. 호반병원장례식장 (✅ HTTPS로 “페이지 안에서 바로 보이게” 구성) -->
   <div class="parlor-card" id="card-2">
     <div class="card-header">
       <h2>호반병원장례식장</h2>
       <div class="info">
         <span class="tel">📞 <a href="tel:033-252-0046">033-252-0046</a></span>
 
-        <!-- 원본 페이지(새창) -->
-        <a href="https://www.hobanfuneral.co.kr/index.php?mid=sub43&order_type=asc&sort_index=var1" target="_blank" class="link-btn">
+        <!-- 원본 페이지 (HTTPS) -->
+        <a href="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
+           target="_blank" class="link-btn">
           원본 페이지
           <svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
@@ -163,21 +167,21 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
     <div class="iframe-wrap" id="hobanWrap">
       <iframe
         id="hobanFrame"
-        src="https://www.hobanfuneral.co.kr/index.php?mid=sub43&order_type=asc&sort_index=var1"
+        src="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
         scrolling="yes"
       ></iframe>
 
-      <!-- 호반 사이트가 점검/다운이면 자동 안내 -->
-      <div class="fallback" id="hobanFallback">
-        <div class="box">
+      <!-- ✅ 호반 사이트가 점검/다운이면 자동으로 안내 표시 -->
+      <div class="fallback-overlay" id="hobanFallback">
+        <div class="fallback-box">
           <div class="title">호반 빈소현황 연결이 원활하지 않습니다</div>
           <div class="desc">
             현재 호반 홈페이지 점검/접속 문제로<br>
-            페이지 안에서 표시되지 않을 수 있습니다.<br>
-            아래 버튼으로 바로 열어 확인하세요.
+            빈소현황이 페이지 안에 표시되지 않을 수 있습니다.<br>
+            아래 버튼으로 바로 열어 확인해 주세요.
           </div>
           <a class="btn"
-             href="https://www.hobanfuneral.co.kr/index.php?mid=sub43&order_type=asc&sort_index=var1"
+             href="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
              target="_blank" rel="noopener">
             👉 호반 빈소현황 열기
           </a>
@@ -230,17 +234,17 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
       <span class="addr">📍 춘천시 시민장례식장</span>
     </div>
   </div>
+
 </div>
 
 <script>
 function switchTab(idx) {
   document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
   document.querySelectorAll('.parlor-card').forEach((c, i) => c.classList.toggle('show', i === idx));
-
-  // 호반 탭일 때만 로드 실패 감지(보험)
-  if (idx === 2) armHobanFailover();
+  if (idx === 2) armHobanFailover(); // 호반 탭일 때만 상태 점검
 }
 
+// ✅ 호반 iframe 로드 실패 감지(보험)
 let hobanLoaded = false;
 let hobanTimer = null;
 
@@ -273,7 +277,7 @@ setInterval(() => {
   const visible = document.querySelector('.parlor-card.show iframe');
   if (visible) visible.src = visible.src;
 
-  // 호반 탭이 켜져있다면 실패 감지도 다시(점검/복구 대응)
+  // 호반 탭을 보고 있다면, 새로고침 후 상태 점검도 다시
   const hobanCard = document.getElementById('card-2');
   if (hobanCard && hobanCard.classList.contains('show')) armHobanFailover();
 }, 600000);
