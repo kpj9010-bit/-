@@ -1,70 +1,24 @@
 {
-  "updated": "2026-02-02 05:41",
+  "updated": "2026-02-02 15:31",
   "parlors": [
-    {
-      "id": "chuncheon",
-      "name": "춘천장례식장",
-      "tel": "033-256-4444",
-      "telHref": "tel:03325644444",
-      "origUrl": "https://e-iris.co.kr/display/parlor/iframe/324",
-      "binsos": [],
-      "error": "HTTP Error 403: Forbidden"
-    },
-    {
-      "id": "hyojanglye",
-      "name": "강원효장례문화원",
-      "tel": "033-261-4441",
-      "telHref": "tel:03326144441",
-      "origUrl": "https://e-baro.co.kr/api_view/?code=icBnKH",
-      "binsos": [
-        {
-          "num": "101호",
-          "occ": false
-        },
-        {
-          "num": "201호",
-          "occ": false
-        },
-        {
-          "num": "202호",
-          "occ": false
-        },
-        {
-          "num": "301호",
-          "occ": false
-        },
-        {
-          "num": "302호",
-          "occ": false
-        }
-      ]
-    },
     {
       "id": "hoban",
       "name": "호반병원장례식장",
       "tel": "033-252-0046",
       "telHref": "tel:03325200046",
       "origUrl": "http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc",
-      "binsos": [],
-      "error": "HTTP Error 403: Forbidden"
-    },
-    {
-      "id": "gangwon-univ",
-      "name": "강원대학교병원장례식장",
-      "tel": "033-254-5611",
-      "telHref": "tel:03325445611",
-      "origUrl": "https://m.knuh.or.kr/hospitalinfor/funeral_01.asp",
-      "binsos": [],
-      "error": "<urlopen error [SSL: WRONG_SIGNATURE_TYPE] wrong signature type (_ssl.c:1016)>"
-    },
-    {
-      "id": "citizen",
-      "name": "춘천 시민장례식장",
-      "tel": null,
-      "telHref": null,
-      "origUrl": null,
-      "updating": true,
-      "binsos": []
+      "binsos": [
+        {
+          "num": "1호(특실)",
+          "name": "윤경애",
+          "occ": true
+        },
+        {
+          "num": "2호",
+          "name": "김원태",
+          "occ": true
+        }
+      ]
     }
   ]
 }
