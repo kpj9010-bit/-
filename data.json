@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-02 04:00",
+  "updated": "2026-02-02 05:41",
   "parlors": [
     {
       "id": "chuncheon",
@@ -23,19 +23,11 @@
         },
         {
           "num": "201호",
-          "name": "최승돈",
-          "occ": true,
-          "place": "춘천안식원동산추모공원",
-          "checkin": "02.02 09:00",
-          "checkout": "02.03 07:30"
+          "occ": false
         },
         {
           "num": "202호",
-          "name": "허복흥",
-          "occ": true,
-          "place": "경춘공원묘원",
-          "checkin": "02.03 11:00",
-          "checkout": "02.04 09:00"
+          "occ": false
         },
         {
           "num": "301호",
