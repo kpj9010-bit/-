@@ -51,7 +51,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 .updating h3{font-size:.92rem;font-weight:600;margin-bottom:6px}
 .updating p{font-size:.78rem;color:var(--t3);line-height:1.6}
 
-/* ✅ 호반 JSON 표시 영역 */
+/* ✅ 호반 JSON 표시 스타일 */
 .hoban-meta{font-size:.72rem;color:var(--t3);margin-bottom:10px}
 .hoban-list{display:flex;flex-direction:column;gap:10px}
 .hoban-item{
@@ -139,12 +139,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
     </div>
   </div>
 
-  <!-- 2. 호반병원장례식장 (✅ data.json 표시) -->
+  <!-- 2. 호반병원장례식장 (✅ data.json을 읽어 표시) -->
   <div class="parlor-card" id="card-2">
     <div class="card-header">
       <h2>호반병원장례식장</h2>
       <div class="info">
         <span class="tel">📞 <a href="tel:033-252-0046">033-252-0046</a></span>
+
         <a href="https://www.hobanfuneral.co.kr/index.php?listStyle=webzine&mid=sub43&sort_index=var1&order_type=asc"
            target="_blank" class="link-btn">
           원본 페이지
@@ -219,7 +220,7 @@ function switchTab(idx) {
   if (idx === 2) loadHobanData(); // ✅ 호반 탭에서 data.json 로드
 }
 
-// ✅ 호반 data.json 로드 + 렌더
+// ✅ 호반 data.json 로드 + "어떤 구조든" 객체 배열 자동 탐색 후 렌더
 async function loadHobanData(){
   const meta = document.getElementById('hobanMeta');
   const list = document.getElementById('hobanList');
@@ -231,15 +232,94 @@ async function loadHobanData(){
   meta.textContent = '호반 빈소현황 불러오는 중...';
   list.innerHTML = '';
 
+  const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
+
+  function scoreRows(rows){
+    const keys = new Set();
+    rows.slice(0, 5).forEach(r => Object.keys(r || {}).forEach(k => keys.add(String(k))));
+    const keyStr = Array.from(keys).join(' ');
+    const keywords = ['빈소','호실','고인','고인명','발인','입관','상주','별세','장지','운구'];
+    let s = 0;
+    keywords.forEach(w => { if (keyStr.includes(w)) s += 2; });
+    s += Math.min(keys.size, 30) / 10;
+    return s;
+  }
+
+  function findFirstObjectArray(root, maxDepth = 7){
+    const queue = [{ v: root, depth: 0, path: '$' }];
+    let best = null;
+
+    while(queue.length){
+      const { v, depth, path } = queue.shift();
+      if (depth > maxDepth || v == null) continue;
+
+      if (Array.isArray(v)) {
+        const objItems = v.filter(x => isObj(x));
+        if (objItems.length >= 1) {
+          const score = scoreRows(objItems);
+          if (!best || score > best.score) best = { rows: objItems, score, path };
+        }
+        for (let i=0;i<v.length;i++){
+          queue.push({ v: v[i], depth: depth+1, path: `${path}[${i}]` });
+        }
+        continue;
+      }
+
+      if (isObj(v)) {
+        for (const k of Object.keys(v)) {
+          queue.push({ v: v[k], depth: depth+1, path: `${path}.${k}` });
+        }
+      }
+    }
+    return best?.rows || [];
+  }
+
+  function findUpdatedAt(root){
+    const candidates = [];
+    const queue = [root];
+    let guard = 0;
+
+    while(queue.length && guard++ < 2000){
+      const v = queue.shift();
+      if (v == null) continue;
+
+      if (typeof v === 'string') {
+        if (/\d{4}[-./]\d{1,2}[-./]\d{1,2}/.test(v) || /KST|UTC|\d{1,2}:\d{2}/.test(v)) {
+          candidates.push(v);
+        }
+      } else if (Array.isArray(v)) {
+        v.forEach(x => queue.push(x));
+      } else if (isObj(v)) {
+        for (const k of Object.keys(v)) {
+          if (['updatedAt','updated_at','time','timestamp','date','updated'].includes(k)) {
+            if (typeof v[k] === 'string') candidates.unshift(v[k]);
+          }
+          queue.push(v[k]);
+        }
+      }
+    }
+    return candidates[0] || '알 수 없음';
+  }
+
+  function esc(s){
+    return String(s ?? '').replace(/[&<>"']/g, m => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[m]));
+  }
+
   try{
-    // ✅ 이미 확인하신 data.json을 그대로 읽습니다
-    const res = await fetch('./data.json?ts=' + Date.now(), { cache: 'no-store' });
+    // ✅ 파일이 루트에 있는 경우/서브폴더인 경우 모두 대비: 현재 URL 기준으로 생성
+    const base = new URL(location.href);
+    base.hash = '';
+    base.search = '';
+    const url = new URL('data.json', base).toString() + '?ts=' + Date.now();
+
+    const res = await fetch(url, { cache: 'no-store' });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
 
-    const updatedAt = data.updatedAt || data.updated_at || data.time || '알 수 없음';
-    let rows = data.rows || data.data || data.items || data.list || data.result || [];
-    if (!Array.isArray(rows)) rows = [];
+    const updatedAt = findUpdatedAt(data);
+    const rows = findFirstObjectArray(data, 7);
 
     meta.textContent = `업데이트: ${updatedAt} / 총 ${rows.length}건`;
 
@@ -251,23 +331,24 @@ async function loadHobanData(){
     }
 
     rows.forEach((r) => {
-      const room   = r.room || r.hall || r["빈소"] || r["호실"] || '';
-      const name   = r.name || r.deceased || r["고인"] || r["고인명"] || '';
-      const death  = r.death || r["별세"] || r["입관"] || '';
-      const coffin = r.coffin || r["발인"] || r["입관/발인"] || '';
-      const memo   = r.memo || r.family || r["상주"] || r["비고"] || '';
+      const obj = r || {};
+      const room   = obj.room || obj.hall || obj["빈소"] || obj["호실"] || obj["빈소명"] || '';
+      const name   = obj.name || obj.deceased || obj["고인"] || obj["고인명"] || obj["성명"] || '';
+      const death  = obj.death || obj["별세"] || obj["입관"] || obj["입관일시"] || '';
+      const coffin = obj.coffin || obj["발인"] || obj["발인일시"] || obj["입관/발인"] || '';
+      const memo   = obj.memo || obj.family || obj["상주"] || obj["비고"] || obj["장지"] || '';
 
       const div = document.createElement('div');
       div.className = 'hoban-item';
       div.innerHTML = `
         <div class="hoban-top">
-          <div class="hoban-room">${room}</div>
-          <div class="hoban-memo">${memo}</div>
+          <div class="hoban-room">${esc(room)}</div>
+          <div class="hoban-memo">${esc(memo)}</div>
         </div>
-        <div class="hoban-name">${name}</div>
+        <div class="hoban-name">${esc(name)}</div>
         <div class="hoban-sub">
-          ${death ? `정보: ${death}<br>` : ``}
-          ${coffin ? `일정: ${coffin}` : ``}
+          ${death ? `정보: ${esc(death)}<br>` : ``}
+          ${coffin ? `일정: ${esc(coffin)}` : ``}
         </div>
       `;
       list.appendChild(div);
@@ -279,7 +360,7 @@ async function loadHobanData(){
   }
 }
 
-// ✅ 10분마다 현재 탭 자동 새로고침 + 호반이면 재로딩
+// ✅ 10분마다 “현재 보고 있는 탭” 자동 새로고침 (호반은 JSON 재로딩)
 setInterval(() => {
   const visible = document.querySelector('.parlor-card.show iframe');
   if (visible) visible.src = visible.src;
