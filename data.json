@@ -1,5 +1,5 @@
 {
-  "updated": "2026-02-02 01:56",
+  "updated": "2026-02-02 02:49",
   "parlors": [
     {
       "id": "chuncheon",
@@ -33,7 +33,7 @@
           "num": "202호",
           "name": "허복흥",
           "occ": true,
-          "place": "경춘공원묘",
+          "place": "경춘공원묘원",
           "checkin": "02.03 11:00",
           "checkout": "02.04 09:00"
         },
