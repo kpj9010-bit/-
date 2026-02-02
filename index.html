@@ -10,9 +10,6 @@
 :root {
   --bg:#eae7e1;--card:#ffffff;--t1:#1e1e1e;--t2:#52524e;--t3:#8c8480;
   --accent:#4a6e5c;--accent-light:#eaf2ee;--border:#e2ddd7;
-  --occ-bg:#e6efe9;--occ-text:#2d6b4a;
-  --empty-bg:#f5f3f0;--empty-text:#a09890;
-  --warn-bg:#fdf4e8;--warn-text:#c07a2e;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;-webkit-font-smoothing:antialiased}
@@ -21,197 +18,170 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--t1);
 .header h1{font-family:'Noto Serif KR',serif;font-size:1.18rem;font-weight:700;letter-spacing:-.3px;margin-bottom:2px}
 .header .sub{font-size:.7rem;color:var(--t3);font-weight:300}
 
-.tabs{display:flex;gap:6px;padding:12px 12px 0;max-width:680px;margin:0 auto;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs{display:flex;gap:6px;padding:12px 12px 0;max-width:720px;margin:0 auto;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex-shrink:0;display:inline-flex;align-items:center;gap:5px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 13px;font-size:.74rem;font-weight:500;color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .18s;user-select:none}
 .tab:hover{border-color:#b5ccc0}
 .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.tab .cnt{font-size:.62rem;font-weight:600;padding:1px 5px;border-radius:8px;background:var(--accent-light);color:var(--accent)}
-.tab.active .cnt{background:rgba(255,255,255,.2);color:#fff}
 
-.cards{max-width:680px;margin:12px auto 60px;padding:0 12px}
-.card{display:none;background:var(--card);border-radius:14px;box-shadow:0 2px 16px rgba(0,0,0,.05);overflow:hidden;animation:pop .2s ease}
-.card.show{display:block}
+.content{max-width:720px;margin:12px auto 60px;padding:0 12px}
+.parlor-card{display:none;background:var(--card);border-radius:14px;box-shadow:0 2px 16px rgba(0,0,0,.05);overflow:hidden;animation:pop .2s ease}
+.parlor-card.show{display:block}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-.card-top{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid var(--border)}
-.card-top h2{font-family:'Noto Serif KR',serif;font-size:.96rem;font-weight:600}
-.card-top .tel a{font-size:.72rem;color:var(--accent);text-decoration:none;font-weight:500}
-.card-top .tel a:hover{text-decoration:underline}
+.card-header{padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:#fafaf8}
+.card-header h2{font-family:'Noto Serif KR',serif;font-size:.96rem;font-weight:600}
+.card-header .info{display:flex;flex-direction:column;gap:3px;align-items:flex-end}
+.card-header .tel{font-size:.72rem;color:var(--t3)}
+.card-header .tel a{color:var(--accent);text-decoration:none;font-weight:500}
+.card-header .tel a:hover{text-decoration:underline}
+.card-header .link-btn{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;color:var(--accent);text-decoration:none;padding:4px 8px;border-radius:6px;background:var(--accent-light);transition:all .15s}
+.card-header .link-btn:hover{background:var(--accent);color:#fff}
+.card-header .link-btn svg{width:11px;height:11px}
 
-.stat-bar{display:flex;align-items:center;gap:14px;padding:7px 16px;background:#f7f5f2;border-bottom:1px solid var(--border);font-size:.68rem;color:var(--t3)}
-.stat-bar .s{display:flex;align-items:center;gap:3px}
-.stat-bar .s strong{font-weight:600}
-.stat-bar .s.occ strong{color:var(--occ-text)}
-.stat-bar .s.emp strong{color:var(--empty-text)}
-.stat-bar .orig{margin-left:auto;display:inline-flex;align-items:center;gap:3px;font-size:.65rem;color:var(--t3);text-decoration:none;transition:color .18s}
-.stat-bar .orig:hover{color:var(--accent)}
-.stat-bar .orig svg{width:10px;height:10px}
+.iframe-wrap{width:100%;background:#faf8f5;position:relative;min-height:320px}
+.iframe-wrap iframe{width:100%;height:100%;min-height:400px;border:none;display:block}
 
-.binso-list{padding:6px 0}
-.binso-row{display:flex;min-height:58px;border-bottom:1px solid #f0ece6;transition:background .12s}
-.binso-row:last-child{border-bottom:none}
-.binso-row:hover{background:#fdfdfc}
+.card-footer{padding:10px 16px;border-top:1px solid var(--border);background:#fdfcfa;display:flex;align-items:center;gap:12px;font-size:.7rem;color:var(--t3)}
+.card-footer .addr{flex:1}
 
-.b-num{width:48px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid #f0ece6}
-.binso-row.occ .b-num{background:var(--occ-bg)}
-.binso-row.occ .b-num .b-label,.binso-row.occ .b-num .b-val{color:var(--occ-text)}
-.binso-row.emp .b-num{background:var(--empty-bg)}
-.binso-row.emp .b-num .b-label{color:var(--empty-text)}
-.binso-row.emp .b-num .b-val{color:#c8c2bb}
-.b-num .b-label{font-size:.55rem;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
-.b-num .b-val{font-size:.82rem;font-weight:600;margin-top:1px}
+.updating{padding:48px 20px;text-align:center}
+.updating .icon{width:52px;height:52px;background:#fef3e2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.updating .icon svg{width:24px;height:24px;color:#d4883a}
+.updating h3{font-size:.92rem;font-weight:600;margin-bottom:6px}
+.updating p{font-size:.78rem;color:var(--t3);line-height:1.6}
 
-.b-info{flex:1;padding:9px 14px;display:flex;flex-direction:column;justify-content:center;gap:4px}
-.b-top{display:flex;align-items:center;justify-content:space-between}
-.b-name{font-size:.88rem;font-weight:600}
-.binso-row.occ .b-name{color:var(--t1)}
-.binso-row.emp .b-name{color:#bbb5ae;font-weight:400;font-style:italic}
-.badge{font-size:.6rem;font-weight:600;padding:2px 7px;border-radius:8px;letter-spacing:.2px}
-.badge.occ{background:var(--occ-bg);color:var(--occ-text)}
-.badge.emp{background:var(--empty-bg);color:var(--empty-text)}
-.b-detail{display:flex;gap:10px;flex-wrap:wrap}
-.b-detail .d{font-size:.68rem;color:var(--t3);display:flex;align-items:center;gap:3px}
-.b-detail .d .dv{color:var(--t2);font-weight:500}
-
-.notice{padding:38px 20px;text-align:center}
-.notice .ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-.notice .ico svg{width:20px;height:20px}
-.notice .ico.warn{background:var(--warn-bg)}
-.notice .ico.warn svg{color:var(--warn-text)}
-.notice .ico.load{background:#f0f4ff}
-.notice .ico.load svg{color:#5577cc}
-.notice h3{font-size:.86rem;font-weight:600;margin-bottom:4px}
-.notice p{font-size:.72rem;color:var(--t3);line-height:1.6}
-@keyframes spin{to{transform:rotate(360deg)}}
-.spin{animation:spin 1s linear infinite}
-
-@media(max-width:440px){
-  .b-num{width:42px}
-  .b-num .b-val{font-size:.76rem}
-  .b-info{padding:8px 10px}
-  .card-top{flex-direction:column;align-items:flex-start;gap:4px}
+@media(max-width:500px){
+  .header{padding:16px 14px 14px}
+  .header h1{font-size:1.1rem}
+  .card-header{flex-direction:column;align-items:flex-start;gap:6px;padding:12px 14px 10px}
+  .card-header .info{align-items:flex-start}
 }
 </style>
 </head>
 <body>
+
 <div class="header">
   <h1>춘천 장례식장 빈소현황</h1>
-  <span class="sub" id="lastUpdate">로딩 중…</span>
+  <span class="sub">실시간 빈소 현황 확인</span>
 </div>
-<div class="tabs" id="tabs"></div>
-<div class="cards" id="cards"></div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(0)">춘천장례식장</button>
+  <button class="tab" onclick="switchTab(1)">강원효장례문화원</button>
+  <button class="tab" onclick="switchTab(2)">호반병원장례식장</button>
+  <button class="tab" onclick="switchTab(3)">강원대학교병원</button>
+  <button class="tab" onclick="switchTab(4)">시민장례식장</button>
+</div>
+
+<div class="content">
+  <!-- 0. 춘천장례식장 -->
+  <div class="parlor-card show" id="card-0">
+    <div class="card-header">
+      <h2>춘천장례식장</h2>
+      <div class="info">
+        <span class="tel">📞 <a href="tel:03325644444">033-256-4444</a></span>
+        <a href="https://e-iris.co.kr/display/parlor/iframe/324" target="_blank" class="link-btn">
+          원본 페이지
+          <svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="https://e-iris.co.kr/display/parlor/iframe/324" scrolling="yes"></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="addr">📍 동면 소양강로 409</span>
+    </div>
+  </div>
+
+  <!-- 1. 강원효장례문화원 -->
+  <div class="parlor-card" id="card-1">
+    <div class="card-header">
+      <h2>강원효장례문화원</h2>
+      <div class="info">
+        <span class="tel">📞 <a href="tel:03326144441">033-261-4441</a></span>
+        <a href="https://e-baro.co.kr/api_view/?code=icBnKH" target="_blank" class="link-btn">
+          원본 페이지
+          <svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="https://e-baro.co.kr/api_view/?code=icBnKH" scrolling="yes"></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="addr">📍 동내면 순환대로 877</span>
+    </div>
+  </div>
+
+  <!-- 2. 호반병원장례식장 -->
+  <div class="parlor-card" id="card-2">
+    <div class="card-header">
+      <h2>호반병원장례식장</h2>
+      <div class="info">
+        <span class="tel">📞 <a href="tel:03325200046">033-252-0046</a></span>
+        <a href="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" target="_blank" class="link-btn">
+          원본 페이지
+          <svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc" scrolling="yes"></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="addr">📍 삼천동 옛경춘로 663</span>
+    </div>
+  </div>
+
+  <!-- 3. 강원대학교병원장례식장 -->
+  <div class="parlor-card" id="card-3">
+    <div class="card-header">
+      <h2>강원대학교병원장례식장</h2>
+      <div class="info">
+        <span class="tel">📞 <a href="tel:03325445611">033-254-5611</a></span>
+        <a href="https://m.knuh.or.kr/hospitalinfor/funeral_01.asp" target="_blank" class="link-btn">
+          원본 페이지
+          <svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="iframe-wrap">
+      <iframe src="https://m.knuh.or.kr/hospitalinfor/funeral_01.asp" scrolling="yes"></iframe>
+    </div>
+    <div class="card-footer">
+      <span class="addr">📍 효자동 백령로 156</span>
+    </div>
+  </div>
+
+  <!-- 4. 시민장례식장 -->
+  <div class="parlor-card" id="card-4">
+    <div class="card-header">
+      <h2>춘천 시민장례식장</h2>
+    </div>
+    <div class="updating">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>빈소현황 업데이트 중</h3>
+      <p>현재 빈소현황 정보가 업데이트 진행 중입니다.<br>잠시 후 다시 확인해 주세요.</p>
+    </div>
+    <div class="card-footer">
+      <span class="addr">📍 춘천시 시민장례식장</span>
+    </div>
+  </div>
+</div>
 
 <script>
-/* data.json 경로 — 같은 repo루트 */
-const DATA_URL = './data.json';
-
-async function loadAndRender() {
-  try {
-    const res = await fetch(DATA_URL, { cache: 'no-store' });
-    if (!res.ok) throw new Error('data.json ' + res.status);
-    const data = await res.json();
-    renderAll(data);
-  } catch (e) {
-    console.error(e);
-    document.getElementById('lastUpdate').textContent = '데이터 로드 실패 — 잠시 후 재시도';
-    setTimeout(loadAndRender, 30000);
-  }
-}
-
-function renderAll(data) {
-  const tabsEl  = document.getElementById('tabs');
-  const cardsEl = document.getElementById('cards');
-  tabsEl.innerHTML  = '';
-  cardsEl.innerHTML = '';
-
-  data.parlors.forEach((p, i) => {
-    const occ   = (p.binsos||[]).filter(b => b.occ).length;
-    const total = (p.binsos||[]).length;
-
-    const tab = document.createElement('button');
-    tab.className = 'tab' + (i === 0 ? ' active' : '');
-    tab.onclick = () => switchTab(i);
-    tab.innerHTML = p.name + ' <span class="cnt">' + (p.updating ? '–' : occ+'/'+total) + '</span>';
-    tabsEl.appendChild(tab);
-
-    const card = document.createElement('div');
-    card.className = 'card' + (i === 0 ? ' show' : '');
-    card.id = 'card-' + i;
-    card.innerHTML = buildCard(p);
-    cardsEl.appendChild(card);
-  });
-
-  // 업데이트 시각 표시
-  if (data.updated) {
-    const d = new Date(data.updated);
-    document.getElementById('lastUpdate').textContent =
-      '업데이트: ' + d.toLocaleString('ko-KR', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' });
-  }
-}
-
-function buildCard(p) {
-  if (p.updating) {
-    return `<div class="card-top"><h2>${p.name}</h2></div>
-      <div class="notice"><div class="ico warn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div><h3>빈소현황 업데이트 중</h3><p>현재 정보가 업데이트 진행 중입니다.<br>잠시 후 다시 확인해 주세요.</p></div>`;
-  }
-  if (p.error) {
-    return `<div class="card-top"><h2>${p.name}</h2></div>
-      <div class="notice"><div class="ico warn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01" stroke-linecap="round"/></svg>
-      </div><h3>데이터 로드 실패</h3><p>잠시 후 자동으로 재시도합니다.</p></div>`;
-  }
-
-  const binsos = p.binsos || [];
-  const occ = binsos.filter(b => b.occ).length;
-  const emp = binsos.length - occ;
-  let rows = '';
-
-  binsos.forEach(b => {
-    if (b.occ) {
-      rows += `<div class="binso-row occ">
-        <div class="b-num"><span class="b-label">빈소</span><span class="b-val">${b.num}</span></div>
-        <div class="b-info">
-          <div class="b-top"><span class="b-name">${b.name}</span><span class="badge occ">사용중</span></div>
-          <div class="b-detail">
-            ${b.place&&b.place!=='-'?`<span class="d">장지 <span class="dv">${b.place}</span></span>`:''}
-            ${b.checkin&&b.checkin!=='-'&&b.checkin!=='미정'?`<span class="d">입관 <span class="dv">${b.checkin}</span></span>`:''}
-            ${b.checkout&&b.checkout!=='-'&&b.checkout!=='미정'?`<span class="d">발인 <span class="dv">${b.checkout}</span></span>`:''}
-          </div>
-        </div></div>`;
-    } else {
-      rows += `<div class="binso-row emp">
-        <div class="b-num"><span class="b-label">빈소</span><span class="b-val">${b.num}</span></div>
-        <div class="b-info">
-          <div class="b-top"><span class="b-name">빈소 미사용</span><span class="badge emp">빈소</span></div>
-        </div></div>`;
-    }
-  });
-
-  return `<div class="card-top">
-      <h2>${p.name}</h2>
-      ${p.tel?`<span class="tel">📞 <a href="${p.telHref}">${p.tel}</a></span>`:''}
-    </div>
-    <div class="stat-bar">
-      <span class="s">전체 <strong>${binsos.length}개</strong></span>
-      <span class="s occ">사용중 <strong>${occ}개</strong></span>
-      <span class="s emp">빈소 <strong>${emp}개</strong></span>
-      ${p.origUrl?`<a href="${p.origUrl}" target="_blank" class="orig">원본 페이지
-        <svg viewBox="0 0 12 12" fill="none"><path d="M8 2h2v2M5.5 6.5l5-5M9 6.5v3.2C9 10.2 8.2 11 7.2 11H2.8C1.8 11 1 10.2 1 9.2V4.8C1 3.8 1.8 3 2.8 3H5.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></a>`:''}
-    </div>
-    <div class="binso-list">${rows}</div>`;
-}
-
 function switchTab(idx) {
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===idx));
-  document.querySelectorAll('.card').forEach((c,i) => c.classList.toggle('show', i===idx));
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+  document.querySelectorAll('.parlor-card').forEach((c, i) => c.classList.toggle('show', i === idx));
 }
-
-// 초기 로드 + 5분 간격 자동 갱신
-loadAndRender();
-setInterval(loadAndRender, 300000);
 </script>
+
 </body>
 </html>
