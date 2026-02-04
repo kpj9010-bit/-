@@ -256,11 +256,9 @@ async function loadHoban(force) {
   setDebug('', null);
   document.getElementById('hoban-debug').style.display = 'none';
 
-  const target = 'https://funeral-api-dk9a.vercel.app/api/hoban/index.php?mid=sub43&sort_index=var1&order_type=asc';
-
+  const target = 'http://www.hobanfuneral.co.kr/index.php?mid=sub43&sort_index=var1&order_type=asc';
   const result = await fetchViaProxies(target);
-
-  if (!result.ok) {
+  const result = await fetchViaProxies(target);  if (!result.ok) {
     stat.style.display = 'none';
     list.innerHTML =
       '<div style="padding:40px 20px;text-align:center;color:#c07a2e">데이터를 불러올 수 없습니다<br><small style="font-size:.65rem;margin-top:8px;display:block">원본 페이지 버튼을 눌러 확인해주세요</small></div>';
@@ -363,4 +361,5 @@ switchTab(0);
 </script>
 </body>
 </html>
+
 
